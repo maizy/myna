@@ -19,7 +19,8 @@ repositories {
 }
 
 ext {
-	set('testcontainersVersion', "1.17.6")
+	set('testcontainersVersion', '1.17.6')
+	set('immutablesVersion', '2.7.3')
 }
 
 dependencies {
@@ -29,6 +30,8 @@ dependencies {
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.testcontainers:junit-jupiter'
+  annotationProcessor "org.immutables:value:${immutablesVersion}"
+  compileOnly "org.immutables:value:${immutablesVersion}"
 }
 
 dependencyManagement {

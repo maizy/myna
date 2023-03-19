@@ -4,10 +4,10 @@ package dev.maizy.myna.http.api;
  * See LICENSE.txt for details.
  */
 
-import dev.maizy.myna.dto.api.ApiObject;
 import dev.maizy.myna.dto.api.ApiVersion;
+import dev.maizy.myna.dto.api.ImmutableApiObject;
+import dev.maizy.myna.dto.api.ImmutableRoot;
 import dev.maizy.myna.dto.api.Root;
-import java.util.List;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,11 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApiRootController {
   @RequestMapping({"/", ""})
   public Root apiRoot() {
-    return new Root(
-        ApiVersion.version,
-        List.of(
-            new ApiObject(ApiVersion.prefix + "/ruleset", "Define objects and rules for a game")
+    return ImmutableRoot.builder()
+        .version(ApiVersion.version)
+        .addObjects(
+            ImmutableApiObject.builder()
+                .url(ApiVersion.prefix + "/ruleset")
+                .description("Define objects and rules for a game")
+                .build()
         )
-    );
+        .build();
   }
 }

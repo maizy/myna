@@ -4,6 +4,15 @@ package dev.maizy.myna.dto.api;
  * See LICENSE.txt for details.
  */
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.List;
+import org.immutables.value.Value;
 
-public record Root(String version, List<ApiObject> objects) {}
+@Value.Immutable
+@JsonSerialize(as = ImmutableRoot.class)
+@JsonDeserialize(as = ImmutableRoot.class)
+public abstract class Root {
+  public abstract String version();
+  public abstract List<ApiObject> objects();
+}
