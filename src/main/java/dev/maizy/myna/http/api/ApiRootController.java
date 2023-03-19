@@ -18,7 +18,7 @@ public class ApiRootController {
   public Root apiRoot() {
     return ImmutableRoot.builder()
         .version(ApiVersion.version)
-        .addObjects(
+        .addObject(
             ImmutableApiObject.builder()
                 .url(ApiVersion.prefix + "/ruleset")
                 .description("Define objects and rules for a game")

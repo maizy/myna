@@ -32,6 +32,7 @@ dependencies {
 	testImplementation 'org.testcontainers:junit-jupiter'
   annotationProcessor "org.immutables:value:${immutablesVersion}"
   compileOnly "org.immutables:value:${immutablesVersion}"
+  testCompileOnly "org.immutables:value:${immutablesVersion}"
 }
 
 dependencyManagement {
