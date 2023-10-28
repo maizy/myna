@@ -10,6 +10,7 @@
     </additionalParameters>
     <module name="myna.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="dev.maizy.myna.MynaApplication" />
+    <option name="VM_PARAMETERS" value="-Dlogging.level.dev.maizy=TRACE" />
     <option name="WORKING_DIRECTORY" value="file://$ProjectFileDir$" />
     <extension name="coverage">
       <pattern>

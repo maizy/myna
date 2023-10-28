@@ -2,8 +2,9 @@
 
 --changeset myna:1
 create table rulesets (
-  id uuid not null primary key,
-  name text
+  id text not null primary key,
+  name text,
+  ruleset jsonb
 );
 
 --rollback drop table rulesets

@@ -10,7 +10,6 @@ import java.util.List;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@Value.Style(depluralize = true)
 @JsonSerialize(as = ImmutableRoot.class)
 @JsonDeserialize(as = ImmutableRoot.class)
 public abstract class Root {

@@ -4,6 +4,7 @@ package dev.maizy.myna.ruleset;
  * See LICENSE.txt for details.
  */
 
+import dev.maizy.myna.configuration.JacksonConfiguration;
 import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.context.annotation.Import;
 
 @JsonTest
+@Import(JacksonConfiguration.class)
 public class RulesetJsonSerializationTest {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());

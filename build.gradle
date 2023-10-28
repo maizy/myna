@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '2.7.9'
+	id 'org.springframework.boot' version '2.7.17'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
@@ -28,14 +28,19 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'org.liquibase:liquibase-core'
-	runtimeOnly 'org.postgresql:postgresql'
-	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.testcontainers:junit-jupiter'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+
   annotationProcessor "org.immutables:value:${immutablesVersion}"
   compileOnly "org.immutables:value:${immutablesVersion}"
   testCompileOnly "org.immutables:value:${immutablesVersion}"
+
+	implementation 'org.liquibase:liquibase-core'
+	implementation 'org.postgresql:postgresql'
+
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.testcontainers:junit-jupiter'
 }
 
 dependencyManagement {

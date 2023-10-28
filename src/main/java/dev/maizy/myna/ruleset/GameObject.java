@@ -14,7 +14,6 @@ import java.util.UUID;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@Value.Style(depluralize = true)
 @JsonSerialize(as = ImmutableGameObject.class)
 @JsonDeserialize(as = ImmutableGameObject.class)
 public abstract class GameObject implements WithStates<ObjectState> {

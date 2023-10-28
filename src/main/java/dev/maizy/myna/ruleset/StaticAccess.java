@@ -10,7 +10,6 @@ import java.util.Set;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@Value.Style(depluralize = true)
 @JsonSerialize(as = ImmutableStaticAccess.class)
 @JsonDeserialize(as = ImmutableStaticAccess.class)
 public abstract class StaticAccess implements Access {

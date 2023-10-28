@@ -69,10 +69,10 @@ public class SampleRulesets {
         )
         .build();
 
-    final var p1 = ImmutablePlayer.builder().id("p1").build();
-    final var p2 = ImmutablePlayer.builder().id("p2").build();
-    final var p3 = ImmutablePlayer.builder().id("p3").build();
-    final var master = ImmutablePlayer.builder().id("master").build();
+    final var p1 = ImmutablePlayer.of("p1");
+    final var p2 = ImmutablePlayer.of("p2");
+    final var p3 = ImmutablePlayer.of("p3");
+    final var master = ImmutablePlayer.of("master");
 
     final var allowForAllAccess = ImmutableStaticAccess.builder()
         .visibleForAll(true)
