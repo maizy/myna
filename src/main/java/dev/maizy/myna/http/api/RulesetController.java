@@ -22,6 +22,6 @@ public class RulesetController {
 
   @RequestMapping("/ruleset")
   public List<Ruleset> listRulesets() {
-    return rulesetRepository.findAll();
+    return rulesetRepository.findAll().stream().map(dev.maizy.myna.db.entity.Ruleset::getRuleset).toList();
   }
 }

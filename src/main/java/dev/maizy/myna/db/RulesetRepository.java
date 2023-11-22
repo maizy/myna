@@ -4,16 +4,12 @@ package dev.maizy.myna.db;
  * See LICENSE.txt for details.
  */
 
-import dev.maizy.myna.ruleset.Ruleset;
-import java.util.Collections;
+import dev.maizy.myna.db.entity.Ruleset;
 import java.util.List;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 
-@Repository
-@Transactional
-public class RulesetRepository {
-  public List<Ruleset> findAll() {
-    return Collections.emptyList();
-  }
+public interface RulesetRepository extends CrudRepository<Ruleset, String> {
+  @Query(value = "select * from rulesets order by ruleset ->> 'name', id", nativeQuery = true)
+  List<Ruleset> findAll();
 }
