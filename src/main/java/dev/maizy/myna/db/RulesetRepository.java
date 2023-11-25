@@ -4,13 +4,13 @@ package dev.maizy.myna.db;
  * See LICENSE.txt for details.
  */
 
-import dev.maizy.myna.db.entity.Ruleset;
+import dev.maizy.myna.db.entity.RulesetEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-public interface RulesetRepository extends CrudRepository<Ruleset, String> {
+public interface RulesetRepository extends CrudRepository<RulesetEntity, String> {
   @Query(value = "select * from rulesets order by ruleset ->> 'name', id", nativeQuery = true)
-  Page<Ruleset> findAll(Pageable pageable);
+  Page<RulesetEntity> findAll(Pageable pageable);
 }

@@ -4,6 +4,7 @@ package dev.maizy.myna.db.entity;
  * See LICENSE.txt for details.
  */
 
+import dev.maizy.myna.ruleset.Ruleset;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -11,13 +12,13 @@ import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "rulesets")
-public class Ruleset {
+public class RulesetEntity {
 
   @Id
   private String id;
 
   @Type(type = "json")
-  private dev.maizy.myna.ruleset.Ruleset ruleset;
+  private Ruleset ruleset;
 
   public String getId() {
     return id;
