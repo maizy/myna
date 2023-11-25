@@ -1,26 +1,26 @@
-package dev.maizy.myna.http.api;
+package dev.maizy.myna.http.admin_api;
 /*
  * Copyright (c) Nikita Kovalev, maizy.dev, 2023
  * See LICENSE.txt for details.
  */
 
-import dev.maizy.myna.dto.api.ApiVersion;
+import dev.maizy.myna.dto.api.AdminApiVersion;
+import dev.maizy.myna.dto.api.ApiRoot;
 import dev.maizy.myna.dto.api.ImmutableApiObject;
-import dev.maizy.myna.dto.api.ImmutableRoot;
-import dev.maizy.myna.dto.api.Root;
+import dev.maizy.myna.dto.api.ImmutableApiRoot;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@ApiV1Prefix
+@AdminApiV1Prefix
 @RestController
-public class ApiRootController {
+public class AdminApiRootController {
   @RequestMapping({"/", ""})
-  public Root apiRoot() {
-    return ImmutableRoot.builder()
-        .version(ApiVersion.version)
-        .addObjects(
+  public ApiRoot apiRoot() {
+    return ImmutableApiRoot.builder()
+        .version(AdminApiVersion.version)
+        .addObject(
             ImmutableApiObject.builder()
-                .url(ApiVersion.prefix + "/ruleset")
+                .url(AdminApiVersion.prefix + "/ruleset")
                 .description("Define objects and rules for a game")
                 .build()
         )

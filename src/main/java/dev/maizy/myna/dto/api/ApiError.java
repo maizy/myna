@@ -6,13 +6,12 @@ package dev.maizy.myna.dto.api;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.util.List;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableRoot.class)
-@JsonDeserialize(as = ImmutableRoot.class)
-public abstract class Root {
-  public abstract String version();
-  public abstract List<ApiObject> objects();
+@JsonSerialize(as = ImmutableApiError.class)
+@JsonDeserialize(as = ImmutableApiError.class)
+public abstract class ApiError {
+  @Value.Parameter
+  public abstract String error();
 }

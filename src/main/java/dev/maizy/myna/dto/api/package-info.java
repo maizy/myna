@@ -1,3 +1,4 @@
+@MynaImmutableStyle
 package dev.maizy.myna.dto.api;
 
 /*
@@ -5,7 +6,4 @@ package dev.maizy.myna.dto.api;
  * See LICENSE.txt for details.
  */
 
-public interface ApiVersion {
-  String version = "v1";
-  String prefix = "/api/" + version;
-}
+import dev.maizy.myna.MynaImmutableStyle;
