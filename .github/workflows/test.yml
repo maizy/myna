@@ -14,5 +14,6 @@ jobs:
       with:
         java-version: '17'
         distribution: 'adopt-hotspot'
+        cache: 'gradle'
     - name: run tests
       run: ./gradlew cleanTest test -i
