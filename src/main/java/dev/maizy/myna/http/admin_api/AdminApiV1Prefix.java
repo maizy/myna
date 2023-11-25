@@ -1,10 +1,10 @@
-package dev.maizy.myna.http.api;
+package dev.maizy.myna.http.admin_api;
 /*
  * Copyright (c) Nikita Kovalev, maizy.dev, 2023
  * See LICENSE.txt for details.
  */
 
-import dev.maizy.myna.dto.api.ApiVersion;
+import dev.maizy.myna.dto.api.AdminApiVersion;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component
-@RequestMapping(ApiVersion.prefix)
-public @interface ApiV1Prefix {
+@RequestMapping(AdminApiVersion.prefix)
+public @interface AdminApiV1Prefix {
     @AliasFor(annotation = Component.class)
     String value() default "";
 }

@@ -12,3 +12,4 @@ services:
       - "127.0.0.1:5432:5432"
     volumes:
       - './data/postgres/data:/var/lib/postgresql/data'
+      - './data/psql:/opt/psql'

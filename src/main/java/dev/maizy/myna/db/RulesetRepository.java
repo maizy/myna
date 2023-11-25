@@ -5,11 +5,12 @@ package dev.maizy.myna.db;
  */
 
 import dev.maizy.myna.db.entity.Ruleset;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 public interface RulesetRepository extends CrudRepository<Ruleset, String> {
   @Query(value = "select * from rulesets order by ruleset ->> 'name', id", nativeQuery = true)
-  List<Ruleset> findAll();
+  Page<Ruleset> findAll(Pageable pageable);
 }

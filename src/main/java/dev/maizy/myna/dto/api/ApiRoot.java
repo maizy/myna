@@ -10,9 +10,9 @@ import java.util.List;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableRoot.class)
-@JsonDeserialize(as = ImmutableRoot.class)
-public abstract class Root {
+@JsonSerialize(as = ImmutableApiRoot.class)
+@JsonDeserialize(as = ImmutableApiRoot.class)
+public abstract class ApiRoot {
   public abstract String version();
   public abstract List<ApiObject> objects();
 }

@@ -8,5 +8,5 @@ cd "${DEV_DIR}"
 if ! command -v docker-compose &> /dev/null; then
   docker-compose -f db.yml --project-name myna_dev exec postgres psql -U myna $@
 else
-  docker compose -f db.yml --project-name myna_dev exec postgres psql -U myna $@
+  docker compose -f db.yml --project-name myna_dev exec -e 'PSQL_HISTORY=/opt/psql/history' postgres psql -U myna $@
 fi

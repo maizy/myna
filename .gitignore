@@ -22,3 +22,4 @@ build/
 .gradle/
 
 dev/data/postgres/data
+dev/data/psql
