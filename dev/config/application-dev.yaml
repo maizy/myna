@@ -7,3 +7,9 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    dev.maizy: TRACE
+
+myna:
+  admin-api:
+    tokens:
+      - devonlytoken1
