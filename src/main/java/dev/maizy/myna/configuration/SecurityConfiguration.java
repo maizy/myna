@@ -49,11 +49,11 @@ public class SecurityConfiguration {
 
   @Bean
   @Order(2)
-  public SecurityFilterChain gameFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain withSessionFilterChain(HttpSecurity http) throws Exception {
     final var gameAuthFilter = new AuthentificateFromUidFilter();
     gameAuthFilter.setAuthenticationManager(new AuthentificateByUidAuthenticationManager());
 
-    http.requestMatchers().mvcMatchers("/whoami", "/game/**", "/games/**")
+    http.requestMatchers().mvcMatchers(UrisWithSession.mvcRules)
         .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and().sessionManagement().sessionFixation().none()
         .and()
@@ -67,6 +67,8 @@ public class SecurityConfiguration {
   public SecurityFilterChain publicChain(HttpSecurity http) throws Exception {
     return http
         .csrf().disable()
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
+        .and()
         .build();
   }
 }

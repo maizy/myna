@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>myna</title>
-</head>
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(null, ~{::#content})}">
 <body>
-    <h1>Myna</h1>
-</body>
+    <div id="content">
+        <h1>Myna</h1>
 
+        <em>chirp</em>
+    </div>
+</body>
 </html>
