@@ -3,11 +3,18 @@ spring:
     url: 'jdbc:postgresql://127.0.0.1:5432/myna'
     username: myna
     password: devtest
+  thymeleaf:
+    cache: false
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: devtest
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     dev.maizy: TRACE
+    web: DEBUG
 
 myna:
   admin-api:

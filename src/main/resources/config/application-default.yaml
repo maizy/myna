@@ -1,3 +1,18 @@
 spring:
   liquibase:
     change-log: 'classpath:/db/changelog/changelog.sql'
+  session:
+    store-type: redis
+  jpa:
+    open-in-view: false
+  data:
+    redis:
+      repositories:
+        enabled: false
+server:
+  servlet:
+    session:
+      timeout: 14d
+      cookie:
+        name: myna_sid
+        max-age: 28d
