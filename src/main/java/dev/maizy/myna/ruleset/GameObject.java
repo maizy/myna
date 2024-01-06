@@ -29,12 +29,18 @@ public abstract class GameObject implements WithStates<ObjectState> {
     }
   }
 
+  /**
+   * only one state supported for now - <a href="https://github.com/maizy/myna/issues/14">iss #14</a>
+   */
   public abstract List<ObjectState> states();
 
   public abstract Size size();
 
+  /**
+   * only fixed state supported - <a href="https://github.com/maizy/myna/issues/14">iss #14</a>
+   */
   @Value.Default
   public ObjectStateChangeStrategy stateChangeStrategy() {
-    return ObjectStateChangeStrategy.random_fixed;
+    return ObjectStateChangeStrategy.fixed;
   }
 }

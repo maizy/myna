@@ -31,15 +31,21 @@ public abstract class Ruleset {
   }
 
   @Value.Default
-  public List<ObjectsGroup> objectsStacks() {
-    return Collections.emptyList();
-  }
-
-  @Value.Default
   public List<Player> players() {
     return Collections.emptyList();
   }
 
+  /**
+   * unsupported - <a href="https://github.com/maizy/myna/issues/6">iss #6</a>
+   */
+  @Value.Default
+  public List<ObjectsGroup> objectsStacks() {
+    return Collections.emptyList();
+  }
+
+  /**
+   * unsupported - <a href="https://github.com/maizy/myna/issues/11">iss #11</a>
+   */
   @Value.Default
   public List<Zone> zones() {
     return Collections.emptyList();

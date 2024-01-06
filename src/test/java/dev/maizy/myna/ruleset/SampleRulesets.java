@@ -11,7 +11,7 @@ import dev.maizy.myna.surface.ImmutableRectangleAppearance;
 import dev.maizy.myna.surface.ImmutableSize;
 
 public class SampleRulesets {
-  static public Ruleset sampleRuleset() {
+  static public Ruleset allFeaturesRuleset() {
     final ObjectsGroup rootObjects = ImmutableObjectsGroup.builder()
         .addObject(
             ImmutableGameObject.builder()
@@ -195,13 +195,75 @@ public class SampleRulesets {
 
     return ImmutableRuleset
         .builder()
-        .name("Test Game Ruleset")
+        .id("all_features")
+        .name("All Features Ruleset")
         .gameZone(gameZone)
         .addPlayers(p1, p2, p3, master)
         .addZones(p1Zone, p2Zone, p3Zone)
         .rootObjects(rootObjects)
         .addObjectsStack(extrasStack)
         .addObjectsStack(penaltiesStack)
+        .build();
+  }
+
+  static public Ruleset checkersRuleset() {
+    // TODO: position all checkers on the board
+    final var black = ImmutableObjectState.builder()
+        .id("black")
+        .appearance(ImmutableRectangleAppearance.builder().text("⚫️").build())
+        .build();
+
+    final var white = ImmutableObjectState.builder()
+        .id("white")
+        .appearance(ImmutableRectangleAppearance.builder().text("⚪️").build())
+        .build();
+
+    final var rootObjectsBuilder = ImmutableObjectsGroup.builder();
+
+    for (var i = 0; i < 12; i++) {
+      rootObjectsBuilder.addObject(
+          ImmutableGameObject.builder()
+              .id("b" + i)
+              .size(ImmutableSize.of(20, 20))
+              .addState(black)
+              .build()
+      );
+    }
+
+    for (var i = 0; i < 12; i++) {
+      rootObjectsBuilder.addObject(
+          ImmutableGameObject.builder()
+              .id("w" + i)
+              .size(ImmutableSize.of(20, 20))
+              .addState(white)
+              .build()
+      );
+    }
+
+    final var whites = ImmutablePlayer.of("Whites");
+    final var blacks = ImmutablePlayer.of("Blacks");
+
+    final var gameZone = ImmutableZone.builder()
+        .position(
+            ImmutableRectangle.of(
+                ImmutablePoint.of(0, 0),
+                ImmutablePoint.of(1024, 1024)
+            )
+        )
+        .appearance(
+            ImmutableRectangleAppearance.builder()
+                .backgroundColor(Colors.yellow.hex)
+                .build()
+        )
+        .build();
+
+    return ImmutableRuleset
+        .builder()
+        .id("checkers")
+        .name("Checkers")
+        .gameZone(gameZone)
+        .addPlayers(whites, blacks)
+        .rootObjects(rootObjectsBuilder.build())
         .build();
   }
 }

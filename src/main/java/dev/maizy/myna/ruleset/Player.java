@@ -15,6 +15,11 @@ public abstract class Player {
   @Value.Parameter
   public abstract String id();
 
+  @Value.Default
+  public String roleName() {
+    return id();
+  }
+
   public Ref ref() {
     return ImmutableRef.of(id());
   }
