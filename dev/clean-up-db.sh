@@ -12,3 +12,4 @@ else
 fi
 
 rm -rf "${DEV_DIR}/data/postgres/data" >/dev/null 2>&1
+rm -f "${DEV_DIR}/data/redis/dump.rdb" >/dev/null 2>&1
