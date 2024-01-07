@@ -4,7 +4,7 @@ package dev.maizy.myna.http.admin_api;
  * See LICENSE.txt for details.
  */
 
-import dev.maizy.myna.db.RulesetRepository;
+import dev.maizy.myna.db.repository.RulesetRepository;
 import dev.maizy.myna.db.entity.RulesetEntity;
 import dev.maizy.myna.dto.api.ApiErrors;
 import dev.maizy.myna.dto.api.ImmutableApiObjectRef;

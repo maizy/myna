@@ -1,4 +1,4 @@
-package dev.maizy.myna.db;
+package dev.maizy.myna.db.repository;
 /*
  * Copyright (c) Nikita Kovalev, maizy.dev, 2023
  * See LICENSE.txt for details.

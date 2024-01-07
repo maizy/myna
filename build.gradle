@@ -6,7 +6,10 @@ plugins {
 
 group = 'dev.maizy'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_17
+}
 
 configurations {
   compileOnly {
@@ -43,6 +46,7 @@ dependencies {
   implementation 'org.liquibase:liquibase-core'
   implementation 'org.postgresql:postgresql'
   implementation 'io.hypersistence:hypersistence-utils-hibernate-55:3.6.1'
+  implementation 'dev.maizy:gibberish:1.0.0'
 
   runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
