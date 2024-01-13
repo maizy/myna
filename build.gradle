@@ -36,6 +36,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
   implementation 'org.webjars:bootstrap:5.3.2'
+  implementation 'org.webjars.npm:bootstrap-icons:1.11.2'
 
   annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 

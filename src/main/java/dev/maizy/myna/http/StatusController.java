@@ -6,12 +6,15 @@ package dev.maizy.myna.http;
 
 import dev.maizy.myna.dto.ImmutableStatus;
 import dev.maizy.myna.dto.Status;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/status")
 public class StatusController {
-  @RequestMapping("/status")
+
+  @GetMapping
   public Status index() {
     return ImmutableStatus.of("ok");
   }

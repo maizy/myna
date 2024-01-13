@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('New Game', ~{::#content})}">
+<body>
+<div id="content">
+    <h1 class="mt-md-2">New Game</h1>
+    <div class="alert alert-warning" role="alert" th:if="${error} != null" th:text="${error}">
+    </div>
+    <form method="post" th:action="@{/games/create}">
+        <h4 class="mt-4">Ruleset</h4>
+
+        <label class="row mt-4" th:each="ruleset, iter : ${rulesets}">
+            <div class="col-1 text-center">
+                <input type="radio" name="ruleset_id" th:value="${ruleset.id}" th:checked="${iter.first}"/>
+            </div>
+            <div class="col">
+                <h5 th:text="${ruleset.ruleset.name}"></h5>
+                <div th:text="${ruleset.ruleset.description}" class="small description"></div>
+                <div><i class="bi-people-fill"></i> <span th:text="${ruleset.ruleset.players.size()}"></span></div>
+            </div>
+        </label>
+
+        <h4 class="mt-4">Players</h4>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Role</th>
+              <th scope="col" class="w-75">Name</th>
+              <th scope="col" class="text-center">My role</th>
+            </tr>
+          </thead>
+          <tbody class="player-template__container">
+            <tr class="player-template template">
+              <td class="player-template__role">Master</td>
+              <td><input class="player-template__name form-control" type="text" /></td>
+              <td>
+                  <label class="w-100 h-100 text-center">
+                      <input class="player-template__me" type="radio" name="me" />
+                  </label>
+              </td>
+            </tr>
+
+            <tr>
+              <td colspan="2" class="text-end">I'm not taking part</td>
+              <td><label class="w-100 h-100 text-center"><input type="radio" name="me" value="" /></label></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button class="btn btn-primary btn-lg mt-3" type="submit">Create game</button>
+    </form>
+    <script type="application/javascript">
+
+
+    </script>
+</div>
+</body>
+</html>

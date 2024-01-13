@@ -9,6 +9,8 @@ spring:
     redis:
       repositories:
         enabled: false
+  mvc:
+    static-path-pattern: "/static/**"
 server:
   servlet:
     session:
