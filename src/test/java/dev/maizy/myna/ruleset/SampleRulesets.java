@@ -69,10 +69,10 @@ public class SampleRulesets {
         )
         .build();
 
-    final var p1 = ImmutablePlayer.of("p1");
-    final var p2 = ImmutablePlayer.of("p2");
-    final var p3 = ImmutablePlayer.of("p3");
-    final var master = ImmutablePlayer.of("master");
+    final var master = ImmutablePlayer.builder().id("master").roleName("Master").build();
+    final var p1 = ImmutablePlayer.builder().id("p1").roleName("Player 1").build();
+    final var p2 = ImmutablePlayer.builder().id("p2").roleName("Player 2").build();
+    final var p3 = ImmutablePlayer.builder().id("p3").roleName("Player 3").build();
 
     final var allowForAllAccess = ImmutableStaticAccess.builder()
         .visibleForAll(true)
@@ -202,7 +202,7 @@ public class SampleRulesets {
             Some of objects are not supported yet."""
         )
         .gameZone(gameZone)
-        .addPlayers(p1, p2, p3, master)
+        .addPlayers(master, p1, p2, p3)
         .addZones(p1Zone, p2Zone, p3Zone)
         .rootObjects(rootObjects)
         .addObjectsStack(extrasStack)

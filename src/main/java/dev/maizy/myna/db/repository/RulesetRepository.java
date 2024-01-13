@@ -19,6 +19,7 @@ public interface RulesetRepository extends CrudRepository<RulesetEntity, String>
         select
           id,
           jsonb_build_object(
+            'id', ruleset -> 'id',
             'name', ruleset -> 'name',
             'description', ruleset -> 'description',
             'players', ruleset -> 'players'

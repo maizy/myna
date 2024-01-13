@@ -5,6 +5,7 @@ package dev.maizy.myna.http;
  */
 
 import dev.maizy.myna.db.repository.RulesetRepository;
+import dev.maizy.myna.dto.html.ImmutableGamePlayersInfo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,12 @@ public class GamesController {
 
   @GetMapping("/create")
   public String create(Model model) {
-    model.addAttribute("rulesets", rulesetRepository.findAllSummaries());
+    final var rulesets = rulesetRepository.findAllSummaries();
+    model.addAttribute("rulesets", rulesets);
+    model.addAttribute(
+        "playersInfo",
+        ImmutableGamePlayersInfo.fromRulesetEntities(rulesets)
+    );
     return "games/create";
   }
 
