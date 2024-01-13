@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.immutables.value.Value;
+import org.springframework.lang.Nullable;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableRuleset.class)
@@ -23,6 +24,10 @@ public abstract class Ruleset {
 
   public abstract String name();
 
+  @Nullable
+  public abstract String description();
+
+  @Nullable
   public abstract Zone gameZone();
 
   @Value.Default
@@ -49,5 +54,11 @@ public abstract class Ruleset {
   @Value.Default
   public List<Zone> zones() {
     return Collections.emptyList();
+  }
+
+  public void validateOnCreation() {
+    if (gameZone() == null) {
+      throw new IllegalArgumentException("game zone not defined");
+    }
   }
 }

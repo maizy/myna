@@ -197,6 +197,10 @@ public class SampleRulesets {
         .builder()
         .id("all_features")
         .name("All Features Ruleset")
+        .description("""
+            The ruleset consists of all possible objects are available in the Myna engine.
+            Some of objects are not supported yet."""
+        )
         .gameZone(gameZone)
         .addPlayers(p1, p2, p3, master)
         .addZones(p1Zone, p2Zone, p3Zone)
@@ -261,6 +265,15 @@ public class SampleRulesets {
         .builder()
         .id("checkers")
         .name("Checkers")
+        .description("""
+            Checkers, also known as draughts, is a strategy board game for two players which involve forward \
+            movements of uniform game pieces and mandatory captures by jumping over opponent pieces.
+            Checkers is played by two opponents on opposite sides of the game board. One player has black pieces \
+            the other has white pieces. White moves first, then players alternate turns. A player cannot move \
+            the opponent's pieces. A move consists of moving a piece forward to an adjacent unoccupied square. \
+            If the adjacent square contains an opponent's piece, and the square immediately beyond it is vacant, \
+            the piece may be captured (and removed from the game) by jumping over it."""
+        )
         .gameZone(gameZone)
         .addPlayers(whites, blacks)
         .rootObjects(rootObjectsBuilder.build())

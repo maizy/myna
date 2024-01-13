@@ -63,6 +63,11 @@ public class RulesetController {
 
   @PostMapping("/ruleset")
   public ResponseEntity<?> addRuleset(@RequestBody Ruleset ruleset) {
+    try {
+      ruleset.validateOnCreation();
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrors.InvalidData);
+    }
     final String id = ruleset.id();
     if (rulesetRepository.existsById(id)) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrors.DuplicateId);
