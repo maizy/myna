@@ -5,12 +5,12 @@
 <div id="content">
     <h1 class="mt-md-2">New Game</h1>
     <div class="alert alert-warning" role="alert" th:if="${error} != null" th:text="${error}"></div>
-    <form method="post" th:action="@{/games/create}" class="create-form">
+    <form method="post" th:action="@{/games/create}" class="create-form" >
         <h4 class="mt-4">Ruleset</h4>
 
         <label class="row mt-4" th:each="ruleset, iter : ${rulesets}">
             <div class="col-1 text-center">
-                <input type="radio" name="ruleset_id" class="create-form__ruleset_id"
+                <input type="radio" name="rulesetId" class="create-form__ruleset_id"
                        th:value="${ruleset.id}" th:checked="${iter.first}"/>
             </div>
             <div class="col">

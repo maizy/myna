@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "game_players")
@@ -19,10 +20,12 @@ public class GamePlayerEntity {
 
   private String name;
 
+  @Nullable
   private String uid;
 
   private String joinKey;
 
+  @Nullable
   private ZonedDateTime joinedAt;
 
   @Column(nullable = false)
@@ -44,11 +47,12 @@ public class GamePlayerEntity {
     this.name = name;
   }
 
+  @Nullable
   public String getUid() {
     return uid;
   }
 
-  public void setUid(String uid) {
+  public void setUid(@Nullable String uid) {
     this.uid = uid;
   }
 
@@ -66,5 +70,14 @@ public class GamePlayerEntity {
 
   public void setRulesetOrder(int rulesetOrder) {
     this.rulesetOrder = rulesetOrder;
+  }
+
+  @Nullable
+  public ZonedDateTime getJoinedAt() {
+    return joinedAt;
+  }
+
+  public void setJoinedAt(@Nullable ZonedDateTime joinedAt) {
+    this.joinedAt = joinedAt;
   }
 }

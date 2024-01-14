@@ -6,6 +6,7 @@ package dev.maizy.myna.db.repository;
 
 import dev.maizy.myna.db.entity.RulesetEntity;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,17 @@ public interface RulesetRepository extends CrudRepository<RulesetEntity, String>
         from rulesets
         order by ruleset ->> 'name', id""", nativeQuery = true)
   List<RulesetEntity> findAllSummaries();
+
+  @Query(value ="""
+        select
+          id,
+          jsonb_build_object(
+            'id', ruleset -> 'id',
+            'name', ruleset -> 'name',
+            'description', ruleset -> 'description',
+            'players', ruleset -> 'players'
+          ) as ruleset
+        from rulesets
+        where id = ?1""", nativeQuery = true)
+  Optional<RulesetEntity> findSummaryById(String id);
 }
