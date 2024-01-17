@@ -14,6 +14,8 @@ import dev.maizy.myna.db.repository.RulesetRepository;
 import dev.maizy.myna.game_state.GameState;
 import dev.maizy.myna.utils.AccessKeyGenerator;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -22,6 +24,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GameStateService {
+
+  public record GameAndPlayer(GameEntity game, GamePlayerEntity player){}
 
   private final Gibberish gibberish;
   private final AccessKeyGenerator accessKeyGenerator;
@@ -72,6 +76,7 @@ public class GameStateService {
           ownerPlayerId.ifPresent(id -> {
             if (rulesetPlayer.id().equals(id)) {
               playerEntity.setUid(owner);
+              playerEntity.setJoinedAt(now);
             }
           });
           return playerEntity;
@@ -103,5 +108,37 @@ public class GameStateService {
       );
     }
     return gameEntity;
+  }
+
+  public Optional<GameAndPlayer> checkJoinKey(String gameId, String joinKey) {
+    final var maybeGame = gameRepository.findByIdAndFetchRuleset(gameId);
+    if (maybeGame.isEmpty()) {
+      throw new GameStateServiceErrors.GameNotFound("Game not found", gameId);
+    } else {
+      final var game = maybeGame.get();
+      checkGameState(
+          game,
+          Arrays.asList(GameState.created, GameState.upcomming, GameState.launched),
+          "It's too late to join the game"
+      );
+      return gamePlayerRepository.findFirstByIdGameIdAndJoinKey(game.getId(), joinKey)
+          .map(player -> new GameAndPlayer(game, player));
+    }
+  }
+
+  @Transactional
+  public void joinGame(GameAndPlayer gameAndPlayer, String uid) {
+    final var playerEntity = gameAndPlayer.player();
+    playerEntity.setUid(uid);
+    playerEntity.setJoinedAt(ZonedDateTime.now());
+    gamePlayerRepository.save(playerEntity);
+  }
+
+  private void checkGameState(GameEntity game, List<GameState> allowedStates, String errorMessage) {
+    if (!allowedStates.contains(game.getState())) {
+      throw new GameStateServiceErrors.ActionIsForbiddenInCurrentGameState(
+          errorMessage, game.getId(), game.getState(), allowedStates
+      );
+    }
   }
 }

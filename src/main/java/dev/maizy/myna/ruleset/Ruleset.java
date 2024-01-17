@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.immutables.value.Value;
 import org.springframework.lang.Nullable;
@@ -60,5 +61,9 @@ public abstract class Ruleset {
     if (gameZone() == null) {
       throw new IllegalArgumentException("game zone not defined");
     }
+  }
+
+  public Optional<Player> getPlayerById(String playerId) {
+    return players().stream().filter(p -> p.id().equals(playerId)).findAny();
   }
 }

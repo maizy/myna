@@ -5,6 +5,7 @@ package dev.maizy.myna.service;
  */
 
 import dev.maizy.myna.game_state.GameState;
+import java.util.List;
 
 public class GameStateServiceErrors {
   public static class GameStateServiceException extends RuntimeException {
@@ -39,6 +40,47 @@ public class GameStateServiceErrors {
 
     public GameState getToState() {
       return toState;
+    }
+  }
+
+  public static class GameNotFound extends GameStateServiceException {
+    final private String gameId;
+
+    public GameNotFound(String gameId) {
+      super("Game not found");
+      this.gameId = gameId;
+    }
+
+    public GameNotFound(String message, String gameId) {
+      super(message);
+      this.gameId = gameId;
+    }
+
+    public GameNotFound(String message, Throwable cause, String gameId) {
+      super(message, cause);
+      this.gameId = gameId;
+    }
+  }
+
+  public static class ActionIsForbiddenInCurrentGameState extends GameStateServiceException {
+    final private String gameId;
+    final private GameState currentState;
+    final private List<GameState> actionAllowedStates;
+
+    public ActionIsForbiddenInCurrentGameState(
+        String message, String gameId, GameState currentState, List<GameState> actionAllowedStates) {
+      super(message);
+      this.gameId = gameId;
+      this.currentState = currentState;
+      this.actionAllowedStates = actionAllowedStates;
+    }
+
+    public ActionIsForbiddenInCurrentGameState(
+        String message, Throwable cause, String gameId, GameState currentState, List<GameState> actionAllowedStates) {
+      super(message, cause);
+      this.gameId = gameId;
+      this.currentState = currentState;
+      this.actionAllowedStates = actionAllowedStates;
     }
   }
 }
