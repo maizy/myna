@@ -15,7 +15,10 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     dev.maizy: TRACE
     web: DEBUG
-
+server:
+  address: localhost
+#  servlet:
+#    context-path: /myna
 myna:
   admin-api:
     tokens:

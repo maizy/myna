@@ -12,9 +12,22 @@ spring:
   mvc:
     static-path-pattern: "/static/**"
 server:
+  port: 12813
   servlet:
     session:
       timeout: 14d
       cookie:
         name: myna_sid
         max-age: 28d
+myna:
+  admin-api:
+    # preconfigured API token for admin API
+    tokens: []
+
+  # url building settings, override if a reverse proxy is used
+  base-uri:
+    scheme: "http"
+    host: ""
+    # if null server.port will be used
+    port: null
+    # also server.servlet.context-path option takes into account
