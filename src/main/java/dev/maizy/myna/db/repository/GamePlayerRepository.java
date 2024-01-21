@@ -14,4 +14,10 @@ public interface GamePlayerRepository extends CrudRepository<GamePlayerEntity, G
   List<GamePlayerEntity> findAllByIdGameIdOrderByRulesetOrderAscNameAsc(String gameId);
 
   Optional<GamePlayerEntity> findFirstByIdGameIdAndJoinKey(String gameId, String joinKey);
+
+  Optional<GamePlayerEntity> findFirstByIdGameIdAndUidOrderByRulesetOrder(String gameId, String uid);
+
+  Optional<GamePlayerEntity> findFirstByIdGameIdAndIdRulesetPlayerIdAndUid(
+      String gameId, String rulesetPlayerId, String uid
+  );
 }

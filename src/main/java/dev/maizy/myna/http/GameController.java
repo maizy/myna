@@ -4,13 +4,16 @@ package dev.maizy.myna.http;
  * See LICENSE.txt for details.
  */
 
+import dev.maizy.myna.dto.html.ImmutableLobbyPlayer;
 import dev.maizy.myna.http.helper.GameRedirectHelper;
 import dev.maizy.myna.service.GameStateService;
 import dev.maizy.myna.service.GameStateServiceErrors;
-import java.util.Optional;
+import dev.maizy.myna.service.UriService;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,63 +26,146 @@ import org.springframework.web.servlet.ModelAndView;
 public class GameController {
 
   final private GameStateService gameStateService;
+  final private UriService uriService;
 
-  public GameController(GameStateService gameStateService) {
+  public GameController(GameStateService gameStateService, UriService uriService) {
     this.gameStateService = gameStateService;
+    this.uriService = uriService;
   }
 
-  @GetMapping("{gameId}/lobby")
-  @ResponseBody
-  public String lobby(@PathVariable String gameId) {
-    return "game " + gameId;
+  @GetMapping("")
+  public String index() {
+    return "redirect:/games/create";
+  }
+
+  @GetMapping("{gameId}")
+  public String gameIndex(@PathVariable String gameId, Authentication auth) {
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUid(gameId, (String) auth.getPrincipal());
+    return GameRedirectHelper.redirectBasedOnGameState(gameAccessAuth);
   }
 
   @GetMapping("{gameId}/join/{joinKey}")
   public ModelAndView join(@PathVariable String gameId, @PathVariable String joinKey) {
+    final var gameAccessAuth = gameStateService.checkJoinGame(gameId, joinKey);
     final var view = new ModelAndView("game/join");
-    final var maybeGameAndPlayer = checkJoinKeyOrDisplayError(view, gameId, joinKey);
-    maybeGameAndPlayer.ifPresent(gameAndPlayer -> {
-      final var game = gameAndPlayer.game();
-      final var ruleset = game.getRuleset().getRuleset();
-      final var player = gameAndPlayer.player();
-      final var maybeRulesetPlayer = ruleset.getPlayerById(player.getId().getRulesetPlayerId());
-      maybeRulesetPlayer.ifPresent(rulesetPlayer -> view.addObject("roleName", rulesetPlayer.roleName()));
+    final var game = gameAccessAuth.game();
+    final var ruleset = game.getRuleset().getRuleset();
+    final var player = gameAccessAuth.player();
+    final var maybeRulesetPlayer = gameAccessAuth.getRulesetPlayer();
+    maybeRulesetPlayer.ifPresent(rulesetPlayer -> view.addObject("roleName", rulesetPlayer.roleName()));
+    if (player != null) {
       view.addObject("name", player.getName());
-      view.addObject("rulesetName", ruleset.name());
-      view.addObject("joinAllowed", true);
-    });
+    }
+    view.addObject("rulesetName", ruleset.name());
     return view;
   }
 
   @PostMapping("{gameId}/join/{joinKey}")
-  public ModelAndView join(@PathVariable String gameId, @PathVariable String joinKey, Authentication auth) {
-    final var view = new ModelAndView("game/join");
-    final var maybeGameAndPlayer = checkJoinKeyOrDisplayError(view, gameId, joinKey);
-    maybeGameAndPlayer.ifPresent(gameAndPlayer -> {
-      gameStateService.joinGame(gameAndPlayer, (String) auth.getPrincipal());
-      view.setViewName(GameRedirectHelper.redirectBasedOnGameState(gameAndPlayer.game()));
-    });
+  public String join(@PathVariable String gameId, @PathVariable String joinKey, Authentication auth) {
+    final var gameAccessAuth = gameStateService.checkJoinGame(gameId, joinKey);
+    gameStateService.joinGame(gameAccessAuth, (String) auth.getPrincipal());
+    return GameRedirectHelper.redirectBasedOnGameState(gameAccessAuth);
+  }
+
+  /**
+   * Use first found role by uid if any
+   * One uid could play for several roles
+   */
+  @GetMapping("{gameId}/lobby")
+  @ResponseBody
+  public ModelAndView lobbyByUid(@PathVariable String gameId, Authentication auth) {
+    final var uid = (String) auth.getPrincipal();
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUid(gameId, uid);
+    return lobby(gameAccessAuth, uid);
+  }
+
+  @GetMapping("{gameId}/lobby/{rulesetPlayerId}")
+  @ResponseBody
+  public ModelAndView lobbyByPlayerId(
+      @PathVariable String gameId, @PathVariable String rulesetPlayerId, Authentication auth) {
+    final var uid = (String) auth.getPrincipal();
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUidAndPlayerId(gameId, uid, rulesetPlayerId);
+    return lobby(gameAccessAuth, uid);
+  }
+
+  private ModelAndView lobby(GameStateService.GameAccessAuth gameAccessAuth, String uid) {
+    gameStateService.checkLobbyAccess(gameAccessAuth);
+    final var view = new ModelAndView("game/lobby");
+    final var myPlayer = gameAccessAuth.player();
+    final var ruleset = gameAccessAuth.game().getRuleset().getRuleset();
+    // the owner may not participate in the game, but it's able to view the lobby
+    final var isOwner = gameAccessAuth.game().isOwner(uid);
+    view.addObject("isOwner", isOwner);
+    view.addObject("rulesetName", ruleset.name());
+    if (myPlayer != null) {
+      view.addObject("myName", myPlayer.getName());
+    }
+
+    final var players = gameStateService.getPlayers(gameAccessAuth.game())
+        .stream()
+        .map(player -> {
+          final var playerBuilder = ImmutableLobbyPlayer.builder();
+          playerBuilder.name(player.getName());
+
+          if (isOwner && (myPlayer == null || !player.getId().equals(myPlayer.getId()))) {
+            var joinLinkUri = uriService.getBaseUriBuilder()
+                .pathSegment("game", "{gameId}", "join", "{joinKey}")
+                .encode()
+                .buildAndExpand(Map.of("gameId", gameAccessAuth.game().getId(), "joinKey", player.getJoinKey()));
+            playerBuilder.joinLink(joinLinkUri.toUriString());
+          }
+
+          if (myPlayer != null && player.getId().equals(myPlayer.getId())) {
+            playerBuilder.me(true);
+          }
+
+          ruleset.getPlayerById(player.getId().getRulesetPlayerId()).ifPresent(rulesetPlayer -> {
+            playerBuilder.roleName(rulesetPlayer.roleName());
+          });
+
+          return playerBuilder.build();
+        })
+        .toList();
+
+    view.addObject("players", players);
+
     return view;
   }
 
-  private Optional<GameStateService.GameAndPlayer> checkJoinKeyOrDisplayError(
-      ModelAndView view, String gameId, String joinKey) {
-    final Optional<GameStateService.GameAndPlayer> maybeGameAndPlayer;
+
+  @ExceptionHandler(GameStateServiceErrors.GameNotFound.class)
+  public ModelAndView notFoundError(Exception exception) {
+    final var view = new ModelAndView("error");
+    view.setStatus(HttpStatus.NOT_FOUND);
+    view.addObject("error", exception.getMessage());
+    return view;
+  }
+
+  @ExceptionHandler(GameStateServiceErrors.ForbiddenInCurrentGameState.class)
+  public ModelAndView noAccessInCurrentStateError(GameStateServiceErrors.ForbiddenInCurrentGameState error) {
+    final var view = new ModelAndView();
     try {
-      maybeGameAndPlayer = gameStateService.checkJoinKey(gameId, joinKey);
-    } catch (GameStateServiceErrors.GameNotFound e) {
-      view.addObject("error", e.getMessage());
-      view.setStatus(HttpStatus.NOT_FOUND);
-      return Optional.empty();
-    } catch (GameStateServiceErrors.ActionIsForbiddenInCurrentGameState e) {
-      view.addObject("error", e.getMessage());
-      view.setStatus(HttpStatus.FORBIDDEN);
-      return Optional.empty();
+      view.setViewName(GameRedirectHelper.redirectBasedOnGameState(error.getGame()));
+      return view;
+    } catch (IllegalArgumentException e) {
+      return unexpectedError(error);
     }
-    if (maybeGameAndPlayer.isEmpty()) {
-      view.addObject("error", "You aren't allowed to join");
-      view.setStatus(HttpStatus.FORBIDDEN);
-    }
-    return maybeGameAndPlayer;
+  }
+
+  @ExceptionHandler(GameStateServiceErrors.Forbidden.class)
+  public ModelAndView forbiddenError() {
+    final var view = new ModelAndView("error");
+    view.setStatus(HttpStatus.FORBIDDEN);
+    view.addObject("error", "You don't have access to the game");
+    return view;
+  }
+
+  @ExceptionHandler(GameStateServiceErrors.GameStateServiceException.class)
+  public ModelAndView unexpectedError(Exception exception) {
+    final var view = new ModelAndView("error");
+    view.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    view.addObject("error", "Unexpected error");
+    view.addObject("message", exception.getMessage());
+    return view;
   }
 }

@@ -88,6 +88,10 @@ public class GameEntity {
     return ownerUid;
   }
 
+  public boolean isOwner(String uid) {
+    return uid.equals(this.getOwnerUid());
+  }
+
   public void setOwnerUid(String ownerUid) {
     this.ownerUid = ownerUid;
   }

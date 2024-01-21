@@ -4,8 +4,7 @@
 <body>
 <div id="content">
     <h1 class="mt-md-2">Join <span th:if="${rulesetName} != null" th:text="${rulesetName}"></span> game</h1>
-    <div class="text-danger" role="alert" th:if="${error} != null" th:text="${error}"></div>
-    <form method="post" th:action="''" th:if="${joinAllowed}">
+    <form method="post" th:action="''">
         <div class="mb-2" th:unless="${#strings.isEmpty(name)}">Hello, <span th:text="${name}"></span>!</div>
         <div class="mb-2" th:if="${#strings.isEmpty(name)}">Hello!</div>
 

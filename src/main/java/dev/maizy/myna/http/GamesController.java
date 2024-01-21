@@ -4,7 +4,6 @@ package dev.maizy.myna.http;
  * See LICENSE.txt for details.
  */
 
-import dev.maizy.myna.db.entity.GameEntity;
 import dev.maizy.myna.db.repository.RulesetRepository;
 import dev.maizy.myna.dto.html.ImmutableGamePlayersInfo;
 import dev.maizy.myna.http.form.CreateGameForm;
@@ -48,18 +47,18 @@ public class GamesController {
 
   @PostMapping(path = "/create")
   public String processCreateForm(Model model, Authentication auth, CreateGameForm form) {
-    final GameEntity newGame;
+    final GameStateService.GameAccessAuth gameAccessAuth;
     try {
-      newGame = gameStateService.createGame(
+      gameAccessAuth = gameStateService.createGame(
           form.getRulesetId(), (String) auth.getPrincipal(), form.getPlayerName(),
           Optional.of(form.getMe()).filter(v -> !v.isEmpty())
       );
-    } catch (GameStateServiceErrors.GameStateChangeError stateChangeError) {
-      log.error("Unable to create game", stateChangeError);
-      model.addAttribute("error", stateChangeError.getMessage());
+    } catch (GameStateServiceErrors.GameStateServiceException ex) {
+      log.error("Unable to create game", ex);
+      model.addAttribute("error", ex.getMessage());
       return create(model);
     }
-    return GameRedirectHelper.redirectBasedOnGameState(newGame);
+    return GameRedirectHelper.redirectBasedOnGameState(gameAccessAuth);
   }
 
 }

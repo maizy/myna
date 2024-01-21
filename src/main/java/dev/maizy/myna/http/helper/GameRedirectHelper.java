@@ -5,14 +5,30 @@ package dev.maizy.myna.http.helper;
  */
 
 import dev.maizy.myna.db.entity.GameEntity;
+import dev.maizy.myna.service.GameStateService;
+import java.nio.charset.StandardCharsets;
+import org.springframework.web.util.UriUtils;
 
 public class GameRedirectHelper {
 
   static public String redirectBasedOnGameState(GameEntity game) {
     return switch (game.getState()) {
-      case created, upcomming -> "redirect:/game/" + game.getId() + "/lobby";
+      case created, upcomming ->
+          "redirect:/game/" + encode(game.getId()) + "/lobby";
       // TODO
-      default -> throw new RuntimeException("unsupported game state");
+      default -> throw new IllegalArgumentException("unsupported game state");
     };
+  }
+
+  static public String redirectBasedOnGameState(GameStateService.GameAccessAuth gameAccessAuth) {
+    final var baseRedirect = redirectBasedOnGameState(gameAccessAuth.game());
+    if (gameAccessAuth.player() != null) {
+      return baseRedirect + "/" + encode(gameAccessAuth.player().getId().getRulesetPlayerId());
+    }
+    return baseRedirect;
+  }
+
+  static private String encode(String pathSegment) {
+    return UriUtils.encodePathSegment(pathSegment, StandardCharsets.UTF_8);
   }
 }
