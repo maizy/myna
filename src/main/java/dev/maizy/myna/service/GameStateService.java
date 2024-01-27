@@ -262,6 +262,45 @@ public class GameStateService {
     );
   }
 
+  public boolean isAllowedToControlGame(GameAccessAuth gameAccessAuth, String uid) {
+    return onlyForOwner(gameAccessAuth, uid);
+  }
+
+  @Transactional
+  public GameAccessAuth endGame(GameAccessAuth gameAccessAuth, String uid) {
+    final var game = gameAccessAuth.game();
+    if (!isAllowedToControlGame(gameAccessAuth, uid)) {
+      throw new GameStateServiceErrors.Forbidden("You aren't allowed to end the game", game);
+    }
+    checkGameState(
+        game,
+        Arrays.asList(GameState.created, GameState.upcomming, GameState.launched),
+        "The game has already ended"
+    );
+
+    game.setState(GameState.finished);
+    game.setFinishedAt(ZonedDateTime.now());
+
+    final GameEntity updatedGame;
+    try {
+      updatedGame = gameRepository.save(game);
+    } catch (RuntimeException dbError) {
+      throw new GameStateServiceErrors.GameStateServiceException(
+          "Unable to end the game",
+          dbError
+      );
+    }
+    return gameAccessAuth.withGame(updatedGame);
+  }
+
+  public void checkCreditsAccess(GameAccessAuth gameAccessAuth) {
+    checkGameState(
+        gameAccessAuth.game(),
+        List.of(GameState.finished),
+        "The game hasn't started yet"
+    );
+  }
+
   private boolean onlyForOwner(GameAccessAuth gameAccessAuth, String uid) {
     return onlyForOwner(gameAccessAuth.game(), uid);
   }

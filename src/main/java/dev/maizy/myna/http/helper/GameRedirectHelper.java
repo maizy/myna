@@ -17,8 +17,8 @@ public class GameRedirectHelper {
           "redirect:/game/" + encode(game.getId()) + "/lobby";
       case launched ->
           "redirect:/game/" + encode(game.getId()) + "/playground";
-      // TODO
-      default -> throw new IllegalArgumentException("unsupported game state");
+      case finished ->
+          "redirect:/game/" + encode(game.getId()) + "/credits";
     };
   }
 

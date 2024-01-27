@@ -9,6 +9,7 @@ import dev.maizy.myna.http.helper.GameRedirectHelper;
 import dev.maizy.myna.service.GameStateService;
 import dev.maizy.myna.service.GameStateServiceErrors;
 import dev.maizy.myna.service.UriService;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -88,48 +90,11 @@ public class GameController {
   private ModelAndView lobby(GameStateService.GameAccessAuth gameAccessAuth, String uid) {
     gameStateService.checkLobbyAccess(gameAccessAuth);
     final var view = new ModelAndView("game/lobby");
-    final var myPlayer = gameAccessAuth.player();
-    final var game = gameAccessAuth.game();
-    final var ruleset = game.getRuleset().getRuleset();
-    // the owner may not participate in the game, but it's able to view the lobby
-    final var isOwner = game.isOwner(uid);
-    view.addObject("gameId", game.getId());
-    view.addObject("isOwner", isOwner);
+    final var isOwner = gameAccessAuth.game().isOwner(uid);
+
+    setGameViewInfo(view, gameAccessAuth, uid);
     view.addObject("isAllowedToLaunch", gameStateService.isAllowedToLaunchGame(gameAccessAuth, uid));
-    view.addObject("rulesetName", ruleset.name());
-    if (myPlayer != null) {
-      view.addObject("myName", myPlayer.getName());
-      view.addObject("myPlayerId", myPlayer.getId().getRulesetPlayerId());
-    }
-
-    final var players = gameStateService.getPlayers(game)
-        .stream()
-        .map(player -> {
-          final var playerBuilder = ImmutableLobbyPlayer.builder();
-          playerBuilder.name(player.getName());
-
-          if (isOwner && (myPlayer == null || !player.getId().equals(myPlayer.getId()))) {
-            var joinLinkUri = uriService.getBaseUriBuilder()
-                .pathSegment("game", "{gameId}", "join", "{joinKey}")
-                .encode()
-                .buildAndExpand(Map.of("gameId", game.getId(), "joinKey", player.getJoinKey()));
-            playerBuilder.joinLink(joinLinkUri.toUriString());
-          }
-
-          if (myPlayer != null && player.getId().equals(myPlayer.getId())) {
-            playerBuilder.me(true);
-          }
-
-          ruleset.getPlayerById(player.getId().getRulesetPlayerId()).ifPresent(rulesetPlayer -> {
-            playerBuilder.roleName(rulesetPlayer.roleName());
-          });
-
-          return playerBuilder.build();
-        })
-        .toList();
-
-    view.addObject("players", players);
-
+    view.addObject("players", getLobbyPlayers(gameAccessAuth, isOwner));
     return view;
   }
 
@@ -175,15 +140,109 @@ public class GameController {
   private ModelAndView playground(GameStateService.GameAccessAuth gameAccessAuth, String uid) {
     gameStateService.checkPlaygroundAccess(gameAccessAuth);
     final var view = new ModelAndView("game/playground");
+    setGameViewInfo(view, gameAccessAuth, uid);
+    view.addObject("players", getLobbyPlayers(gameAccessAuth, false));
+    return view;
+  }
+
+  @PostMapping("{gameId}/playground")
+  public String controlGameByUid(@PathVariable String gameId, @RequestParam String action, Authentication auth) {
+    final var uid = (String) auth.getPrincipal();
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUid(gameId, uid);
+    return controlGame(gameAccessAuth, uid, action);
+  }
+
+  @PostMapping("{gameId}/playground/{rulesetPlayerId}")
+  public String controlGameByPlayerId(
+      @PathVariable String gameId,
+      @PathVariable String rulesetPlayerId,
+      @RequestParam String action,
+      Authentication auth) {
+    final var uid = (String) auth.getPrincipal();
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUidAndPlayerId(gameId, uid, rulesetPlayerId);
+    return controlGame(gameAccessAuth, uid, action);
+  }
+
+  private String controlGame(GameStateService.GameAccessAuth gameAccessAuth, String uid, String action) {
+    gameStateService.checkPlaygroundAccess(gameAccessAuth);
+    final GameStateService.GameAccessAuth updatedGame;
+    if (action.equals("end-game")) {
+      updatedGame = gameStateService.endGame(gameAccessAuth, uid);
+    } else {
+      throw new IllegalArgumentException("Unknown game action");
+    }
+    return GameRedirectHelper.redirectBasedOnGameState(updatedGame);
+  }
+
+  @GetMapping("{gameId}/credits")
+  public ModelAndView creditsByUid(@PathVariable String gameId, Authentication auth) {
+    final var uid = (String) auth.getPrincipal();
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUid(gameId, uid);
+    return credits(gameAccessAuth, uid);
+  }
+
+  @GetMapping("{gameId}/credits/{rulesetPlayerId}")
+  public ModelAndView creditsByPlayerId(
+      @PathVariable String gameId, @PathVariable String rulesetPlayerId, Authentication auth) {
+    final var uid = (String) auth.getPrincipal();
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUidAndPlayerId(gameId, uid, rulesetPlayerId);
+    return lobby(gameAccessAuth, uid);
+  }
+
+  private ModelAndView credits(GameStateService.GameAccessAuth gameAccessAuth, String uid) {
+    gameStateService.checkCreditsAccess(gameAccessAuth);
+    final var view = new ModelAndView("game/credits");
+    setGameViewInfo(view, gameAccessAuth, uid);
+    return view;
+  }
+
+  private List<ImmutableLobbyPlayer> getLobbyPlayers(
+      GameStateService.GameAccessAuth gameAccessAuth, boolean withLinks) {
     final var myPlayer = gameAccessAuth.player();
-    final var ruleset = gameAccessAuth.game().getRuleset().getRuleset();
-    final var isOwner = gameAccessAuth.game().isOwner(uid);
-    view.addObject("isOwner", isOwner);
+    final var game = gameAccessAuth.game();
+    final var ruleset = game.getRuleset().getRuleset();
+    return gameStateService.getPlayers(game)
+        .stream()
+        .map(player -> {
+          final var playerBuilder = ImmutableLobbyPlayer.builder();
+          playerBuilder.name(player.getName());
+
+          if (withLinks && (myPlayer == null || !player.getId().equals(myPlayer.getId()))) {
+            var joinLinkUri = uriService.getBaseUriBuilder()
+                .pathSegment("game", "{gameId}", "join", "{joinKey}")
+                .encode()
+                .buildAndExpand(Map.of("gameId", game.getId(), "joinKey", player.getJoinKey()));
+            playerBuilder.joinLink(joinLinkUri.toUriString());
+          }
+
+          if (myPlayer != null && player.getId().equals(myPlayer.getId())) {
+            playerBuilder.me(true);
+          }
+
+          ruleset.getPlayerById(player.getId().getRulesetPlayerId()).ifPresent(rulesetPlayer -> {
+            playerBuilder.roleName(rulesetPlayer.roleName());
+          });
+
+          return playerBuilder.build();
+        })
+        .toList();
+  }
+
+  private void setGameViewInfo(ModelAndView view, GameStateService.GameAccessAuth gameAccessAuth, String uid) {
+    final var myPlayer = gameAccessAuth.player();
+    final var game = gameAccessAuth.game();
+    final var ruleset = game.getRuleset().getRuleset();
+    view.addObject("gameId", game.getId());
+    view.addObject("isOwner", game.isOwner(uid));
     view.addObject("rulesetName", ruleset.name());
     if (myPlayer != null) {
       view.addObject("myName", myPlayer.getName());
+      view.addObject("myRoleName", myPlayer.getName());
+      view.addObject("myPlayerId", myPlayer.getId().getRulesetPlayerId());
+      ruleset.getPlayerById(myPlayer.getId().getRulesetPlayerId()).ifPresent(rulesetPlayer -> {
+        view.addObject("myRoleName", rulesetPlayer.roleName());
+      });
     }
-    return view;
   }
 
   @ExceptionHandler(GameStateServiceErrors.GameNotFound.class)
