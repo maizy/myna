@@ -8,6 +8,7 @@ services:
       POSTGRES_USER: myna
       POSTGRES_PASSWORD: devtest
       POSTGRES_DB: myna
+      TZ: "UTC"
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
