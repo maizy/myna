@@ -5,7 +5,8 @@
 <div id="content">
     <h1 class="mt-md-2">New Game</h1>
     <div class="alert alert-warning" role="alert" th:if="${error} != null" th:text="${error}"></div>
-    <form method="post" th:action="''" class="create-form" >
+    <div th:if="${rulesets.isEmpty()}">Sorry, there is no ruleset set up on the server yet.</div>
+    <form method="post" th:action="''" class="create-form" th:if="${!rulesets.isEmpty()}">
         <h4 class="mt-4">Ruleset</h4>
 
         <label class="row mt-4" th:each="ruleset, iter : ${rulesets}">
