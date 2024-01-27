@@ -15,6 +15,8 @@ public class GameRedirectHelper {
     return switch (game.getState()) {
       case created, upcomming ->
           "redirect:/game/" + encode(game.getId()) + "/lobby";
+      case launched ->
+          "redirect:/game/" + encode(game.getId()) + "/playground";
       // TODO
       default -> throw new IllegalArgumentException("unsupported game state");
     };

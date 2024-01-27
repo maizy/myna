@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Playground', ~{::#content})}">
+<body>
+<div id="content">
+    <h1 class="mt-md-2"><span th:if="${rulesetName} != null" th:text="${rulesetName}"></span> game</h1>
+    <div class="mb-2" th:unless="${#strings.isEmpty(myName)}">Hello, <span th:text="${myName}"></span>!</div>
+</div>
+</body>
+</html>

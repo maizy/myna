@@ -43,8 +43,12 @@ public class GameStateService {
       }
     }
 
-    public GameAccessAuth withPlayer(GamePlayerEntity player) {
-      return new GameAccessAuth(game, player);
+    public GameAccessAuth withPlayer(GamePlayerEntity updatedPlayer) {
+      return new GameAccessAuth(game, updatedPlayer);
+    }
+
+    public GameAccessAuth withGame(GameEntity updatedGame) {
+      return new GameAccessAuth(updatedGame, player);
     }
   }
 
@@ -143,7 +147,7 @@ public class GameStateService {
             new GameAccessAuth(game, gamePlayerEntity)
         )
         .or(() -> {
-          if (game.isOwner(uid)) {
+          if (onlyForOwner(game, uid)) {
             return Optional.of(new GameAccessAuth(game, null));
           } else {
             return Optional.empty();
@@ -216,8 +220,54 @@ public class GameStateService {
     );
   }
 
+  public boolean isAllowedToLaunchGame(GameAccessAuth gameAccessAuth, String uid) {
+    return onlyForOwner(gameAccessAuth, uid);
+  }
+
   public List<GamePlayerEntity> getPlayers(GameEntity game) {
     return gamePlayerRepository.findAllByIdGameIdOrderByRulesetOrderAscNameAsc(game.getId());
+  }
+
+  @Transactional
+  public GameAccessAuth launchGame(GameAccessAuth gameAccessAuth, String uid) {
+    final var game = gameAccessAuth.game();
+    if (!isAllowedToLaunchGame(gameAccessAuth, uid)) {
+      throw new GameStateServiceErrors.Forbidden("You aren't allowed to launch the game", game);
+    }
+    checkGameState(
+        game,
+        Arrays.asList(GameState.created, GameState.upcomming),
+        "The game has already started"
+    );
+
+    game.setState(GameState.launched);
+    final GameEntity updatedGame;
+    try {
+      updatedGame = gameRepository.save(game);
+    } catch (RuntimeException dbError) {
+      throw new GameStateServiceErrors.GameStateServiceException(
+          "Unable to launch the game",
+          dbError
+      );
+    }
+    return gameAccessAuth.withGame(updatedGame);
+  }
+
+  public void checkPlaygroundAccess(GameAccessAuth gameAccessAuth) {
+    checkGameState(
+        gameAccessAuth.game(),
+        List.of(GameState.launched),
+        gameAccessAuth.game().getState() == GameState.finished
+            ? "The game has finished" : "The game hasn't started yet"
+    );
+  }
+
+  private boolean onlyForOwner(GameAccessAuth gameAccessAuth, String uid) {
+    return onlyForOwner(gameAccessAuth.game(), uid);
+  }
+
+  private boolean onlyForOwner(GameEntity game, String uid) {
+    return game.isOwner(uid);
   }
 
   private void checkGameState(GameEntity game, List<GameState> allowedStates, @Nullable String message) {

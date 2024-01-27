@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -72,7 +71,6 @@ public class GameController {
    * One uid could play for several roles
    */
   @GetMapping("{gameId}/lobby")
-  @ResponseBody
   public ModelAndView lobbyByUid(@PathVariable String gameId, Authentication auth) {
     final var uid = (String) auth.getPrincipal();
     final var gameAccessAuth = gameStateService.checkGameAccessAuthByUid(gameId, uid);
@@ -80,7 +78,6 @@ public class GameController {
   }
 
   @GetMapping("{gameId}/lobby/{rulesetPlayerId}")
-  @ResponseBody
   public ModelAndView lobbyByPlayerId(
       @PathVariable String gameId, @PathVariable String rulesetPlayerId, Authentication auth) {
     final var uid = (String) auth.getPrincipal();
@@ -92,16 +89,20 @@ public class GameController {
     gameStateService.checkLobbyAccess(gameAccessAuth);
     final var view = new ModelAndView("game/lobby");
     final var myPlayer = gameAccessAuth.player();
-    final var ruleset = gameAccessAuth.game().getRuleset().getRuleset();
+    final var game = gameAccessAuth.game();
+    final var ruleset = game.getRuleset().getRuleset();
     // the owner may not participate in the game, but it's able to view the lobby
-    final var isOwner = gameAccessAuth.game().isOwner(uid);
+    final var isOwner = game.isOwner(uid);
+    view.addObject("gameId", game.getId());
     view.addObject("isOwner", isOwner);
+    view.addObject("isAllowedToLaunch", gameStateService.isAllowedToLaunchGame(gameAccessAuth, uid));
     view.addObject("rulesetName", ruleset.name());
     if (myPlayer != null) {
       view.addObject("myName", myPlayer.getName());
+      view.addObject("myPlayerId", myPlayer.getId().getRulesetPlayerId());
     }
 
-    final var players = gameStateService.getPlayers(gameAccessAuth.game())
+    final var players = gameStateService.getPlayers(game)
         .stream()
         .map(player -> {
           final var playerBuilder = ImmutableLobbyPlayer.builder();
@@ -111,7 +112,7 @@ public class GameController {
             var joinLinkUri = uriService.getBaseUriBuilder()
                 .pathSegment("game", "{gameId}", "join", "{joinKey}")
                 .encode()
-                .buildAndExpand(Map.of("gameId", gameAccessAuth.game().getId(), "joinKey", player.getJoinKey()));
+                .buildAndExpand(Map.of("gameId", game.getId(), "joinKey", player.getJoinKey()));
             playerBuilder.joinLink(joinLinkUri.toUriString());
           }
 
@@ -132,6 +133,58 @@ public class GameController {
     return view;
   }
 
+  @PostMapping("{gameId}/lobby")
+  public String launchGameByUid(@PathVariable String gameId, Authentication auth) {
+    final var uid = (String) auth.getPrincipal();
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUid(gameId, uid);
+    return launchGame(gameAccessAuth, uid);
+  }
+
+  @PostMapping("{gameId}/lobby/{rulesetPlayerId}")
+  public String launchGameByPlayerId(
+      @PathVariable String gameId, @PathVariable String rulesetPlayerId, Authentication auth) {
+    final var uid = (String) auth.getPrincipal();
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUidAndPlayerId(gameId, uid, rulesetPlayerId);
+    return launchGame(gameAccessAuth, uid);
+  }
+
+  private String launchGame(GameStateService.GameAccessAuth gameAccessAuth, String uid) {
+    final var updatedGame = gameStateService.launchGame(gameAccessAuth, uid);
+    return GameRedirectHelper.redirectBasedOnGameState(updatedGame);
+  }
+
+  /**
+   * Use first found role by uid if any
+   * One uid could play for several roles
+   */
+  @GetMapping("{gameId}/playground")
+  public ModelAndView playgroundByUid(@PathVariable String gameId, Authentication auth) {
+    final var uid = (String) auth.getPrincipal();
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUid(gameId, uid);
+    return playground(gameAccessAuth, uid);
+  }
+
+  @GetMapping("{gameId}/playground/{rulesetPlayerId}")
+  public ModelAndView playgroundByPlayerId(
+      @PathVariable String gameId, @PathVariable String rulesetPlayerId, Authentication auth) {
+    final var uid = (String) auth.getPrincipal();
+    final var gameAccessAuth = gameStateService.checkGameAccessAuthByUidAndPlayerId(gameId, uid, rulesetPlayerId);
+    return playground(gameAccessAuth, uid);
+  }
+
+  private ModelAndView playground(GameStateService.GameAccessAuth gameAccessAuth, String uid) {
+    gameStateService.checkPlaygroundAccess(gameAccessAuth);
+    final var view = new ModelAndView("game/playground");
+    final var myPlayer = gameAccessAuth.player();
+    final var ruleset = gameAccessAuth.game().getRuleset().getRuleset();
+    final var isOwner = gameAccessAuth.game().isOwner(uid);
+    view.addObject("isOwner", isOwner);
+    view.addObject("rulesetName", ruleset.name());
+    if (myPlayer != null) {
+      view.addObject("myName", myPlayer.getName());
+    }
+    return view;
+  }
 
   @ExceptionHandler(GameStateServiceErrors.GameNotFound.class)
   public ModelAndView notFoundError(Exception exception) {
