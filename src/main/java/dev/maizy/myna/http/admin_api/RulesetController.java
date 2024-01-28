@@ -9,6 +9,7 @@ import dev.maizy.myna.db.entity.RulesetEntity;
 import dev.maizy.myna.dto.api.ApiErrors;
 import dev.maizy.myna.dto.api.ImmutableApiObjectRef;
 import dev.maizy.myna.ruleset.Ruleset;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -56,6 +57,9 @@ public class RulesetController {
     try {
       rulesetRepository.deleteById(id);
       return ResponseEntity.noContent().build();
+    } catch (DataIntegrityViolationException e) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN)
+          .body(ApiErrors.unable("The ruleset already has games based on it"));
     } catch (EmptyResultDataAccessException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiErrors.NotFound);
     }
