@@ -22,7 +22,7 @@ repositories {
 }
 
 ext {
-  set('testcontainersVersion', '1.17.6')
+  set('testcontainersVersion', '1.19.4')
   set('immutablesVersion', '2.7.3')
 }
 
@@ -54,6 +54,8 @@ dependencies {
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.testcontainers:junit-jupiter'
+  testImplementation 'org.testcontainers:postgresql'
+  testImplementation 'com.redis.testcontainers:testcontainers-redis-junit-jupiter:1.4.6'
 }
 
 dependencyManagement {
