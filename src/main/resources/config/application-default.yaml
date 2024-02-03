@@ -13,6 +13,8 @@ spring:
     static-path-pattern: "/static/**"
 server:
   port: 12813
+  tomcat:
+    use-relative-redirects: true
   servlet:
     session:
       timeout: 14d

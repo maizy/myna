@@ -1,4 +1,4 @@
-package dev.maizy.myna.integration_tests;
+package dev.maizy.myna.integration_test;
 /*
  * Copyright (c) Nikita Kovalev, maizy.dev, 2024
  * See LICENSE.txt for details.
@@ -6,6 +6,8 @@ package dev.maizy.myna.integration_tests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redis.testcontainers.RedisContainer;
+import dev.maizy.myna.integration_test.container.Postgres;
+import dev.maizy.myna.integration_test.container.Redis;
 import dev.maizy.myna.ruleset.SampleRulesets;
 import dev.maizy.myna.service.GameStateService;
 import java.util.Collections;
@@ -26,7 +28,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.utility.DockerImageName;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"default", "test"})
@@ -40,15 +41,10 @@ class AdminApiTest {
   private GameStateService gameStateService;
 
   @Container
-  private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:16.1-alpine");
-
-  private static final String redisPass = "testpass";
+  private static final PostgreSQLContainer<?> postgreSQLContainer = Postgres.build();
 
   @Container
-  private static final RedisContainer redisContainer =
-      new RedisContainer(DockerImageName.parse("redis:7.2.3-alpine"))
-          .withExposedPorts(6379)
-          .withCommand("redis-server", "--requirepass", redisPass);
+  private static final RedisContainer redisContainer = Redis.build();
 
   @BeforeAll
   static void beforeAll() {
@@ -64,15 +60,9 @@ class AdminApiTest {
 
   @DynamicPropertySource
   static void configureProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-    registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-    registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-
-    registry.add("spring.redis.host", redisContainer::getHost);
-    registry.add("spring.redis.port", () -> redisContainer.getMappedPort(6379).toString());
-    registry.add("spring.redis.password", () -> redisPass);
+    Postgres.use(postgreSQLContainer, registry);
+    Redis.use(redisContainer, registry);
   }
-
 
   @Test
   void shouldForbidAccessWithoutToken(@Autowired WebTestClient webClient) {

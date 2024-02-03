@@ -186,7 +186,7 @@ public class GameController {
       @PathVariable String gameId, @PathVariable String rulesetPlayerId, Authentication auth) {
     final var uid = (String) auth.getPrincipal();
     final var gameAccessAuth = gameStateService.checkGameAccessAuthByUidAndPlayerId(gameId, uid, rulesetPlayerId);
-    return lobby(gameAccessAuth, uid);
+    return credits(gameAccessAuth, uid);
   }
 
   private ModelAndView credits(GameStateService.GameAccessAuth gameAccessAuth, String uid) {
