@@ -78,8 +78,9 @@ class GameStateFlowTest {
     assertThat(body1).isEqualTo(response2.getResponseBody());
   }
 
-  @Test
-  void shouldAllowOwnerToCreateGameAndChangeItState(@Autowired WebTestClient webClient) {
+  private record CreatedGame(String ownerSid, String lobbyLocation){}
+
+  private CreatedGame createGame(WebTestClient webClient) {
     // get create form
     final var createFormResponse = webClient
         .get()
@@ -107,6 +108,14 @@ class GameStateFlowTest {
         .returnResult(Void.class);
     final var lobbyLocation = createResponse.getResponseHeaders().getFirst("Location");
     assertThat(lobbyLocation).isNotNull();
+    return new CreatedGame(sid, lobbyLocation);
+  }
+
+  @Test
+  void shouldAllowOwnerToCreateGameAndChangeItState(@Autowired WebTestClient webClient) {
+    final var createdGame = createGame(webClient);
+    final var sid = createdGame.ownerSid();
+    final var lobbyLocation = createdGame.lobbyLocation();
 
     // lobby
     log.info("Get lobby: {}", lobbyLocation);
@@ -168,6 +177,60 @@ class GameStateFlowTest {
         .get()
           .uri(creditsLocation)
           .cookie("myna_sid", sid)
+        .exchange()
+        .expectStatus().isOk();
+  }
+
+  @Test
+  void shouldAllowOtherPlayersJoining(@Autowired WebTestClient webClient) {
+    final var createdGame = createGame(webClient);
+    final var ownerSid = createdGame.ownerSid();
+    final var lobbyLocation = createdGame.lobbyLocation();
+
+    // lobby for owner
+    final var ownerLobbyBody = webClient
+        .get()
+          .uri(lobbyLocation)
+          .cookie("myna_sid", ownerSid)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(String.class).returnResult().getResponseBody();
+    assertThat(ownerLobbyBody).isNotNull();
+
+    final var joinLinks = Jsoup.parse(ownerLobbyBody).getElementsByTag("code");
+    assertThat(joinLinks).hasSize(1);
+
+    final var joinLink = joinLinks.get(0).text();
+
+    // player join page
+    final var joinResult = webClient
+        .get()
+          .uri(joinLink)
+        .exchange()
+        .expectStatus().isOk()
+        .expectCookie().exists("myna_sid")
+        .expectBody(String.class).returnResult();
+
+    final var playerSid = getSid(joinResult);
+    final var joinCsrf = getCsrfFormToken(joinResult);
+
+    // player joins the game
+    final var joinResponse = webClient
+        .post()
+          .uri(joinLink)
+          .cookie("myna_sid", playerSid)
+          .body(BodyInserters.fromFormData("_csrf", joinCsrf))
+        .exchange()
+        .expectStatus().isFound()
+        .returnResult(Void.class);
+    final var playerLobbyLocation = joinResponse.getResponseHeaders().getFirst("Location");
+    assertThat(playerLobbyLocation).isNotNull();
+
+    // lobby for player
+    webClient
+        .get()
+          .uri(playerLobbyLocation)
+          .cookie("myna_sid", playerSid)
         .exchange()
         .expectStatus().isOk();
   }
