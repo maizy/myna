@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout::content('Lobby', ~{::#content})}">
+<body>
+<div id="content">
+    <h1 class="mt-md-2"><span th:if="${rulesetName} != null" th:text="${rulesetName}"></span> game</h1>
+    <div class="mb-2" th:unless="${#strings.isEmpty(myName)}">Hello, <span th:text="${myName}"></span>!</div>
+
+    <h4 class="mt-4">Players</h4>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" style="width: 5%;"></th>
+          <th scope="col">Role</th>
+          <th scope="col">Name</th>
+          <th scope="col" th:if="${isOwner}">Invite link</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="player : ${players}">
+          <td class="text-center"><i class="bi bi-person-arms-up" th:if="${player.me}"></i></td>
+          <td th:text="${player.roleName}">Master</td>
+          <td th:text="${player.name}">Anonymous</td>
+          <td th:if="${isOwner}">
+              <code th:text="${player.joinLink}" th:if="${player.joinLink != null}"></code>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <form th:if="${isAllowedToLaunch}"
+          th:action="@{/game/{gameId}/lobby/{myPlayerId}(gameId = ${gameId}, myPlayerId = ${myPlayerId})}"
+          class="mt-3" method="post">
+        <button class="btn btn-primary btn-lg" type="submit" name="action" value="start">Start game</button>
+    </form>
+</div>
+</body>
+</html>

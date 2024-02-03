@@ -24,5 +24,12 @@ public abstract class Zone {
         .backgroundColor(Colors.white.hex)
         .build();
   }
-  public abstract Access access();
+
+  /**
+   * unsupported - <a href="https://github.com/maizy/myna/issues/11">iss #11</a>
+   */
+  @Value.Default
+  public Access access() {
+    return ImmutableStaticAccess.builder().visibleForAll(true).ownedForAll(true).build();
+  }
 }

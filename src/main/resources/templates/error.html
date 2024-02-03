@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout::content(${error}, ~{::#content})}">
+<body>
+    <div id="content">
+        <p class="fs-3"> <span class="text-danger">Oops!</span></p>
+        <h1 class="display-1 fw-bold" th:text="${error}">Error 500</h1>
+        <p class="lead" th:text="${message}" th:if="${message} != null">Error description</p>
+        <a th:href="@{/}" href="/">Start from the beginning</a>
+    </div>
+</body>
+</html>

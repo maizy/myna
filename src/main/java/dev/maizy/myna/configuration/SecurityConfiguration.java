@@ -4,11 +4,15 @@ package dev.maizy.myna.configuration;
  * See LICENSE.txt for details.
  */
 
+import dev.maizy.myna.auth.AuthentificateByUidAuthenticationManager;
+import dev.maizy.myna.auth.AuthentificateFromUidFilter;
+import dev.maizy.myna.auth.AutoGenerateUidFilter;
 import dev.maizy.myna.auth.PreconfiguratedTokensFilter;
 import dev.maizy.myna.dto.api.AdminApiVersion;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,19 +30,45 @@ public class SecurityConfiguration {
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    var adminAuthFilter = new PreconfiguratedTokensFilter();
-    adminAuthFilter.setAuthenticationManager(adminAuthManager);
+  @Order(1)
+  public SecurityFilterChain adminApiFilterChain(HttpSecurity http) throws Exception {
+    final var adminApiAuthFilter = new PreconfiguratedTokensFilter();
+    adminApiAuthFilter.setAuthenticationManager(adminAuthManager);
 
-    http
-      .antMatcher(AdminApiVersion.prefix + "/**")
+    http.mvcMatcher(AdminApiVersion.prefix + "/**")
         .csrf().disable()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
-        .addFilter(adminAuthFilter)
+        .addFilter(adminApiAuthFilter)
         .authorizeRequests()
-        .anyRequest().authenticated();
+        .anyRequest().authenticated()
+        .and().anonymous().disable();
 
     return http.build();
+  }
+
+  @Bean
+  @Order(2)
+  public SecurityFilterChain withSessionFilterChain(HttpSecurity http) throws Exception {
+    final var gameAuthFilter = new AuthentificateFromUidFilter();
+    gameAuthFilter.setAuthenticationManager(new AuthentificateByUidAuthenticationManager());
+
+    http.requestMatchers().mvcMatchers(UrisWithSession.mvcRules)
+        .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and().sessionManagement().sessionFixation().none()
+        .and()
+        .addFilter(gameAuthFilter)
+        .addFilterBefore(new AutoGenerateUidFilter(), AuthentificateFromUidFilter.class)
+        .anonymous().disable();
+    return http.build();
+  }
+
+  @Bean
+  public SecurityFilterChain publicChain(HttpSecurity http) throws Exception {
+    return http
+        .csrf().disable()
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
+        .and()
+        .build();
   }
 }

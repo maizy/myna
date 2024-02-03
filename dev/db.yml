@@ -2,14 +2,22 @@ version: '3.1'
 
 services:
   postgres:
-    image: postgres:15.2-alpine
+    image: postgres:16.1-alpine
     container_name: myna_dev_postgres
     environment:
       POSTGRES_USER: myna
       POSTGRES_PASSWORD: devtest
       POSTGRES_DB: myna
+      TZ: "UTC"
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
       - './data/postgres/data:/var/lib/postgresql/data'
       - './data/psql:/opt/psql'
+  redis:
+    image: redis:7.2.3-alpine
+    ports:
+      - '127.0.0.1:6379:6379'
+    command: redis-server --save 5 1 --loglevel warning --requirepass devtest
+    volumes:
+      - './data/redis:/data'

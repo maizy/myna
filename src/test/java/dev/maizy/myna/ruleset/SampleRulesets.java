@@ -11,7 +11,7 @@ import dev.maizy.myna.surface.ImmutableRectangleAppearance;
 import dev.maizy.myna.surface.ImmutableSize;
 
 public class SampleRulesets {
-  static public Ruleset sampleRuleset() {
+  static public Ruleset allFeaturesRuleset() {
     final ObjectsGroup rootObjects = ImmutableObjectsGroup.builder()
         .addObject(
             ImmutableGameObject.builder()
@@ -69,10 +69,10 @@ public class SampleRulesets {
         )
         .build();
 
-    final var p1 = ImmutablePlayer.of("p1");
-    final var p2 = ImmutablePlayer.of("p2");
-    final var p3 = ImmutablePlayer.of("p3");
-    final var master = ImmutablePlayer.of("master");
+    final var master = ImmutablePlayer.builder().id("master").roleName("Master").build();
+    final var p1 = ImmutablePlayer.builder().id("p1").roleName("Player 1").build();
+    final var p2 = ImmutablePlayer.builder().id("p2").roleName("Player 2").build();
+    final var p3 = ImmutablePlayer.builder().id("p3").roleName("Player 3").build();
 
     final var allowForAllAccess = ImmutableStaticAccess.builder()
         .visibleForAll(true)
@@ -195,13 +195,88 @@ public class SampleRulesets {
 
     return ImmutableRuleset
         .builder()
-        .name("Test Game Ruleset")
+        .id("all_features")
+        .name("All Features Ruleset")
+        .description("""
+            The ruleset consists of all possible objects are available in the Myna engine.
+            Some of objects are not supported yet."""
+        )
         .gameZone(gameZone)
-        .addPlayers(p1, p2, p3, master)
+        .addPlayers(master, p1, p2, p3)
         .addZones(p1Zone, p2Zone, p3Zone)
         .rootObjects(rootObjects)
         .addObjectsStack(extrasStack)
         .addObjectsStack(penaltiesStack)
+        .build();
+  }
+
+  static public Ruleset checkersRuleset() {
+    // TODO: position all checkers on the board
+    final var black = ImmutableObjectState.builder()
+        .id("black")
+        .appearance(ImmutableRectangleAppearance.builder().text("⚫️").build())
+        .build();
+
+    final var white = ImmutableObjectState.builder()
+        .id("white")
+        .appearance(ImmutableRectangleAppearance.builder().text("⚪️").build())
+        .build();
+
+    final var rootObjectsBuilder = ImmutableObjectsGroup.builder();
+
+    for (var i = 0; i < 12; i++) {
+      rootObjectsBuilder.addObject(
+          ImmutableGameObject.builder()
+              .id("b" + i)
+              .size(ImmutableSize.of(20, 20))
+              .addState(black)
+              .build()
+      );
+    }
+
+    for (var i = 0; i < 12; i++) {
+      rootObjectsBuilder.addObject(
+          ImmutableGameObject.builder()
+              .id("w" + i)
+              .size(ImmutableSize.of(20, 20))
+              .addState(white)
+              .build()
+      );
+    }
+
+    final var whites = ImmutablePlayer.of("Whites");
+    final var blacks = ImmutablePlayer.of("Blacks");
+
+    final var gameZone = ImmutableZone.builder()
+        .position(
+            ImmutableRectangle.of(
+                ImmutablePoint.of(0, 0),
+                ImmutablePoint.of(1024, 1024)
+            )
+        )
+        .appearance(
+            ImmutableRectangleAppearance.builder()
+                .backgroundColor(Colors.yellow.hex)
+                .build()
+        )
+        .build();
+
+    return ImmutableRuleset
+        .builder()
+        .id("checkers")
+        .name("Checkers")
+        .description("""
+            Checkers, also known as draughts, is a strategy board game for two players which involve forward \
+            movements of uniform game pieces and mandatory captures by jumping over opponent pieces.
+            Checkers is played by two opponents on opposite sides of the game board. One player has black pieces \
+            the other has white pieces. White moves first, then players alternate turns. A player cannot move \
+            the opponent's pieces. A move consists of moving a piece forward to an adjacent unoccupied square. \
+            If the adjacent square contains an opponent's piece, and the square immediately beyond it is vacant, \
+            the piece may be captured (and removed from the game) by jumping over it."""
+        )
+        .gameZone(gameZone)
+        .addPlayers(whites, blacks)
+        .rootObjects(rootObjectsBuilder.build())
         .build();
   }
 }

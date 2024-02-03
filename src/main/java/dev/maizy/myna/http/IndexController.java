@@ -1,18 +1,18 @@
 package dev.maizy.myna.http;
 /*
- * Copyright (c) Nikita Kovalev, maizy.dev, 2023
+ * Copyright (c) Nikita Kovalev, maizy.dev, 2024
  * See LICENSE.txt for details.
  */
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@RequestMapping("/")
 public class IndexController {
-  @RequestMapping("")
-  @ResponseBody
+  @GetMapping
   public String index() {
-    return "hi!";
+    return "index";
   }
 }

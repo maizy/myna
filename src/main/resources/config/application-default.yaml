@@ -1,3 +1,35 @@
 spring:
   liquibase:
     change-log: 'classpath:/db/changelog/changelog.sql'
+  session:
+    store-type: redis
+  jpa:
+    open-in-view: false
+  data:
+    redis:
+      repositories:
+        enabled: false
+  mvc:
+    static-path-pattern: "/static/**"
+server:
+  port: 12813
+  tomcat:
+    use-relative-redirects: true
+  servlet:
+    session:
+      timeout: 14d
+      cookie:
+        name: myna_sid
+        max-age: 28d
+myna:
+  admin-api:
+    # preconfigured API token for admin API
+    tokens: []
+
+  # url building settings, override if a reverse proxy is used
+  base-uri:
+    scheme: "http"
+    host: ""
+    # if null server.port will be used
+    port: null
+    # also server.servlet.context-path option takes into account

@@ -4,9 +4,9 @@
  */
 
 @TypeDef(
-    name = "json", typeClass = JsonType.class
+    name = "jsonb", typeClass = JsonBinaryType.class
 )
 package dev.maizy.myna.db;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import org.hibernate.annotations.TypeDef;

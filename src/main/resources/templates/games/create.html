@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout::content('New Game', ~{::#content})}">
+<body>
+<div id="content">
+    <h1 class="mt-md-2">New Game</h1>
+    <div class="alert alert-warning" role="alert" th:if="${error} != null" th:text="${error}"></div>
+    <div th:if="${rulesets.isEmpty()}">Sorry, there is no ruleset set up on the server yet.</div>
+    <form method="post" th:action="''" class="create-form" th:if="${!rulesets.isEmpty()}">
+        <h4 class="mt-4">Ruleset</h4>
+
+        <label class="row mt-4" th:each="ruleset, iter : ${rulesets}">
+            <div class="col-1 text-center">
+                <input type="radio" name="rulesetId" class="create-form__ruleset_id"
+                       th:value="${ruleset.id}" th:checked="${iter.first}"/>
+            </div>
+            <div class="col">
+                <h5 th:text="${ruleset.ruleset.name}"></h5>
+                <div th:text="${ruleset.ruleset.description}" class="small description"></div>
+                <div><i class="bi-people-fill"></i> <span th:text="${ruleset.ruleset.players.size()}"></span></div>
+            </div>
+        </label>
+
+        <h4 class="mt-4">Players</h4>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Role</th>
+              <th scope="col" class="w-75">Name</th>
+              <th scope="col" class="text-center">My role</th>
+            </tr>
+          </thead>
+          <tbody class="player-template__container">
+            <tr class="player-template template">
+              <td class="player-template__role">Master</td>
+              <td><input class="player-template__name form-control" type="text" /></td>
+              <td>
+                  <label class="w-100 h-100 text-center">
+                      <input class="player-template__me" type="radio" name="me" />
+                  </label>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" class="text-end">I'm not taking part</td>
+              <td><label class="w-100 h-100 text-center"><input type="radio" name="me" value="" /></label></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <button class="btn btn-primary btn-lg mt-3" type="submit">Create game</button>
+    </form>
+    <script th:inline="javascript">
+        (function() {
+            window.MynaCreateForm = {};
+            window.MynaCreateForm.playersInfo = /*[[${playersInfo}]]*/{};
+
+            const Manager = function (playersInfo) {
+                this.playersInfo = playersInfo;
+            };
+
+            function getFirstElementByClassName() {
+                const context = (arguments.length === 2) ? arguments[0] : window.document;
+                const className = (arguments.length === 2) ? arguments[1] : arguments[0];
+                const elements = context.getElementsByClassName(className);
+                return (elements.length > 0) ? elements[0] : undefined;
+            }
+            Manager.prototype.init = function () {
+                this.$container = getFirstElementByClassName("player-template__container");
+                this.$template = getFirstElementByClassName(this.$container, "player-template");
+
+                this.$form = getFirstElementByClassName("create-form");
+                this.$rulesetsInputs = Array.from(this.$form.getElementsByClassName("create-form__ruleset_id"));
+
+                this.$rulesetsInputs.forEach(value =>
+                    value.addEventListener("change", this.onRulesetChange.bind(this))
+                );
+
+                this.rebuildPlayers();
+            };
+
+            Manager.prototype.onRulesetChange = function () {
+                this.rebuildPlayers();
+            };
+
+            Manager.prototype.getCurrentRulesetId = function () {
+                const checkedInput = this.$rulesetsInputs.find(e => e.checked);
+                if (checkedInput !== undefined) {
+                    return checkedInput.value;
+                }
+                return undefined;
+            };
+
+            Manager.prototype.rebuildPlayers = function () {
+                const that = this;
+                Array.from(this.$container.getElementsByClassName("player-template__item"))
+                    .forEach(element =>
+                        element.remove()
+                    );
+
+                const ruleset = this.getCurrentRulesetId();
+                if (ruleset !== undefined) {
+                    const players = this.playersInfo[ruleset].players;
+                    let firstPlayer = true;
+                    players.forEach(player => {
+                        const playerNode = that.$template.cloneNode(true);
+                        playerNode.classList.remove("template");
+                        playerNode.classList.add("player-template__item");
+                        getFirstElementByClassName(playerNode, "player-template__role").innerText = player.roleName;
+
+                        const playerName = getFirstElementByClassName(playerNode, "player-template__name");
+                        playerName.name = `playerName[${player.id}]`;
+
+                        const me = getFirstElementByClassName(playerNode, "player-template__me");
+                        me.value = player.id;
+                        if (firstPlayer) {
+                            me.checked = true;
+                            firstPlayer = false;
+                        }
+                        that.$container.append(playerNode);
+                    });
+                }
+            };
+
+            window.MynaCreateForm.manager = new Manager(window.MynaCreateForm.playersInfo);
+            window.MynaCreateForm.manager.init();
+        })();
+    </script>
+</div>
+</body>
+</html>

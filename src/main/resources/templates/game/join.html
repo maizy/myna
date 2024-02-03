@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout::content('Join Game', ~{::#content})}">
+<body>
+<div id="content">
+    <h1 class="mt-md-2">Join <span th:if="${rulesetName} != null" th:text="${rulesetName}"></span> game</h1>
+    <form method="post" th:action="''">
+        <div class="mb-2" th:unless="${#strings.isEmpty(name)}">Hello, <span th:text="${name}"></span>!</div>
+        <div class="mb-2" th:if="${#strings.isEmpty(name)}">Hello!</div>
+
+        <div th:unless="${#strings.isEmpty(roleName)}">You will be playing the role of <span th:text="${roleName}"></span>.</div>
+        <button class="btn btn-primary mt-3" type="submit">Join</button>
+    </form>
+</div>
+</body>
+</html>

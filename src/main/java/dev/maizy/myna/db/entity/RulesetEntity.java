@@ -17,7 +17,7 @@ public class RulesetEntity {
   @Id
   private String id;
 
-  @Type(type = "json")
+  @Type(type = "jsonb")
   private Ruleset ruleset;
 
   public String getId() {

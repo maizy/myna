@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout::content(null, ~{::#content})}">
+<body>
+    <div id="content">
+        <div class="px-4 py-5 my-5 text-center">
+            <h1 class="display-5 fw-bold">Myna</h1>
+            <div class="col-lg-6 mx-auto">
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center pt-5">
+                    <a type="button" class="btn btn-primary btn-lg px-4 gap-3"
+                       th:href="@{/games/create}">
+                        Create game</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

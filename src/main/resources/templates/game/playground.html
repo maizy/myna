@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/partial/head::head('Playground')}"></head>
+<body>
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="col-auto bg-light" style="max-width: 300px">
+            <div class="d-flex flex-column min-vh-100">
+                <h1 class="d-flex pb-3 pt-3 fs-5" th:text="${rulesetName != null ? rulesetName : 'Game'}">
+                    Game
+                </h1>
+
+                <div class="pt-2 pb-2 fw-bolder">Players</div>
+                <div th:class="${isOwner} ? 'flex-column' : 'flex-column mb-auto'">
+                    <table class="table table-sm table-secondary">
+                        <tbody>
+                        <tr th:each="player : ${players}">
+                            <td class="align-middle" style="width: 5%;"><i class="bi bi-circle-fill"></i></td>
+                            <td>
+                                <span th:text="${player.name}" th:unless="${#strings.isEmpty(player.name)}">Name</span>
+                                <br th:unless="${#strings.isEmpty(player.name)}"/>
+                                <em class="text-muted" th:text="${player.roleName}">Role name</em>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pt-2 pb-2 fw-bolder" th:if="${isOwner}">Control panel</div>
+                <div class="flex-column mb-auto" th:if="${isOwner}">
+                    <form th:action="@{/game/{gameId}/playground/{myPlayerId}(gameId = ${gameId}, myPlayerId = ${myPlayerId})}"
+                          method="post">
+                        <button class="btn btn-primary btn-sm mt-3" type="submit"
+                                name="action" value="end-game">End game</button>
+                    </form>
+                </div>
+                <div class="pb-4 small text-muted">
+                    Powered by Myna
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div>🐢 Playing surface will be here ... </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

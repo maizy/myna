@@ -6,7 +6,10 @@ plugins {
 
 group = 'dev.maizy'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_17
+}
 
 configurations {
   compileOnly {
@@ -19,7 +22,7 @@ repositories {
 }
 
 ext {
-  set('testcontainersVersion', '1.17.6')
+  set('testcontainersVersion', '1.19.4')
   set('immutablesVersion', '2.7.3')
 }
 
@@ -29,6 +32,12 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.session:spring-session-data-redis'
+  implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+  implementation 'org.webjars:bootstrap:5.3.2'
+  implementation 'org.webjars.npm:bootstrap-icons:1.11.2'
+
   annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
   annotationProcessor "org.immutables:value:${immutablesVersion}"
@@ -38,11 +47,16 @@ dependencies {
   implementation 'org.liquibase:liquibase-core'
   implementation 'org.postgresql:postgresql'
   implementation 'io.hypersistence:hypersistence-utils-hibernate-55:3.6.1'
+  implementation 'dev.maizy:gibberish:1.0.0'
 
   runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.testcontainers:junit-jupiter'
+  testImplementation 'org.testcontainers:postgresql'
+  testImplementation 'com.redis.testcontainers:testcontainers-redis-junit-jupiter:1.4.6'
+  testImplementation 'org.jsoup:jsoup:1.17.2'
 }
 
 dependencyManagement {
