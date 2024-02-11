@@ -14,7 +14,7 @@ public class UrisWithSession {
   public static final String[] resources = {"/whoami"};
   private static final Set<String> resourcesSet = new HashSet<>(Arrays.asList(resources));
 
-  public static final String[] resourcesPrefixes = {"/game", "/games"};
+  public static final String[] resourcesPrefixes = {"/game", "/games", "/ws"};
   public static final String[] mvcRules = Stream.concat(
       Arrays.stream(resourcesPrefixes).map(p -> p + "/**"),
       Arrays.stream(resources)

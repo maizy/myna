@@ -34,6 +34,69 @@
           class="mt-3" method="post">
         <button class="btn btn-primary btn-lg" type="submit" name="action" value="start">Start game</button>
     </form>
+
+    <hr/>
+
+    <button id="startWs">Start WS</button>
+    <button id="sendMessage">Send message</button>
+
+    <div id="results" class="row"></div>
+
+    <script>
+        (function() {
+            function MynaWebsocketHandler() {
+                this.connection = null;
+            }
+
+            MynaWebsocketHandler.prototype.init = function () {
+                this.$startWs = document.getElementById("startWs");
+                this.$sendMessage = document.getElementById("sendMessage");
+                this.$result = document.getElementById("results");
+
+                this.$startWs.addEventListener("click", this.open.bind(this));
+                this.$sendMessage.addEventListener("click", function () {
+                   if (this.connection !== null) {
+                       const message = "" + (+new Date());
+                       this.connection.send(message);
+                       this.dbg(`send message: ${message}`)
+                   } else {
+                       this.dbg("unable to send message, connection is closed");
+                   }
+                }.bind(this));
+            };
+
+            MynaWebsocketHandler.prototype.dbg = function (message) {
+                this.$result.innerText += `\n${message}`;
+            };
+
+            MynaWebsocketHandler.prototype.open = function () {
+                const wsProto = (document.location.protocol === "http:") ? "ws:" : "wss:";
+                this.connection = new WebSocket(`${wsProto}//${document.location.host}/ws/game`);
+
+                this.connection.addEventListener("open", function (e) {
+                   this.dbg(`connection opened: ${e}`);
+                }.bind(this));
+
+                this.connection.addEventListener("error", function (e) {
+                   this.dbg(`error: ${e}`);
+                }.bind(this));
+
+                this.connection.addEventListener("close", function (e) {
+                   this.dbg(`connection closed: ${e}`);
+                   this.connection = null;
+                }.bind(this));
+
+                this.connection.addEventListener("message", function (e) {
+                   this.dbg(`message received: ${e.data}`);
+                }.bind(this));
+            };
+
+            window.Myna = window.Myna || {};
+            window.Myna.wsHandler = new MynaWebsocketHandler();
+            window.Myna.wsHandler.init();
+        })();
+
+    </script>
 </div>
 </body>
 </html>
