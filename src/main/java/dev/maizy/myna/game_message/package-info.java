@@ -1,5 +1,5 @@
 @MynaImmutableStyle
-package dev.maizy.myna.game_message.event;
+package dev.maizy.myna.game_message;
 
 /*
  * Copyright (c) Nikita Kovalev, maizy.dev, 2024
