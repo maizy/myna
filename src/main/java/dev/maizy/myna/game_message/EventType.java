@@ -7,5 +7,6 @@ package dev.maizy.myna.game_message;
 public enum EventType {
   player_connected,
   player_disconnected,
-  players_state_changed
+  players_state_changed,
+  game_state_changed
 }

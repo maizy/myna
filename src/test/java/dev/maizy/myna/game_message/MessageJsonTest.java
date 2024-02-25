@@ -6,12 +6,14 @@ package dev.maizy.myna.game_message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.maizy.myna.configuration.JacksonConfiguration;
+import dev.maizy.myna.game_message.event.ImmutableGameState;
 import dev.maizy.myna.game_message.event.ImmutablePlayerState;
 import dev.maizy.myna.game_message.event.ImmutablePlayerWithStatus;
 import dev.maizy.myna.game_message.event.ImmutablePlayersState;
 import dev.maizy.myna.game_message.event.PlayersState;
 import dev.maizy.myna.game_message.request.ImmutableParameterlessRequest;
 import dev.maizy.myna.game_message.response.ImmutableWhoYouAre;
+import dev.maizy.myna.game_state.GameState;
 import dev.maizy.myna.ruleset.ImmutablePlayer;
 import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,6 +71,25 @@ class MessageJsonTest {
             .addPlayer(ImmutablePlayerWithStatus.of(
                 ImmutablePlayer.of("p2"), PlayersState.PlayerStatus.absent
             ))
+            .build()
+    );
+  }
+
+  @Test
+  public void testGameStateEvent() throws IOException {
+    roundTrip(
+        ImmutableGameState.builder()
+            .gameId("test")
+            .previousState(null)
+            .newState(GameState.created)
+            .build()
+    );
+
+    roundTrip(
+        ImmutableGameState.builder()
+            .gameId("test")
+            .previousState(GameState.launched)
+            .newState(GameState.finished)
             .build()
     );
   }

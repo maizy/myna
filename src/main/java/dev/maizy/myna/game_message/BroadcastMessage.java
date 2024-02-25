@@ -4,5 +4,5 @@ package dev.maizy.myna.game_message;
  * See LICENSE.txt for details.
  */
 
-public record BroadcastMessage(Message message, Long fromWsId) {
+public record BroadcastMessage(Message message, Long exceptWsId) {
 }

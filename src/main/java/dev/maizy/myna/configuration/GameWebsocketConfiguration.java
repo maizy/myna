@@ -5,10 +5,9 @@ package dev.maizy.myna.configuration;
  */
 
 import dev.maizy.myna.auth.AutoGenerateUidFilter;
-import dev.maizy.myna.service.game_events.GameEventsSubscriptionService;
+import dev.maizy.myna.ws.GameAccessWebsocketInterceptor;
 import dev.maizy.myna.ws.GameWebsocketHandler;
 import java.util.Collections;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -19,18 +18,23 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 @EnableWebSocket
 public class GameWebsocketConfiguration implements WebSocketConfigurer {
 
-  private final GameEventsSubscriptionService gameEventsSubscriptionService;
+  private final GameWebsocketHandler gameWebsocketHandler;
+  private final GameAccessWebsocketInterceptor gameAccessWebsocketInterceptor;
 
-  public GameWebsocketConfiguration(@Autowired GameEventsSubscriptionService gameEventsSubscriptionService) {
-    this.gameEventsSubscriptionService = gameEventsSubscriptionService;
+  public GameWebsocketConfiguration(
+      GameWebsocketHandler gameWebsocketHandler,
+      GameAccessWebsocketInterceptor gameAccessWebsocketInterceptor) {
+    this.gameWebsocketHandler = gameWebsocketHandler;
+    this.gameAccessWebsocketInterceptor = gameAccessWebsocketInterceptor;
   }
 
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
     registry
-        .addHandler(new GameWebsocketHandler(gameEventsSubscriptionService), "/ws/game")
+        .addHandler(gameWebsocketHandler, "/ws/game")
         .addInterceptors(
-            new HttpSessionHandshakeInterceptor(Collections.singletonList(AutoGenerateUidFilter.UID_SESSION_KEY))
+            new HttpSessionHandshakeInterceptor(Collections.singletonList(AutoGenerateUidFilter.UID_SESSION_KEY)),
+            gameAccessWebsocketInterceptor
         );
   }
 

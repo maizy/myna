@@ -42,10 +42,12 @@
 
     <div id="results" class="row"></div>
 
-    <script>
+    <script th:inline="javascript">
         (function() {
-            function MynaWebsocketHandler() {
+            function MynaWebsocketHandler(gameId, myPlayerId) {
                 this.connection = null;
+                this.gameId = gameId;
+                this.myPlayerId = myPlayerId;
             }
 
             MynaWebsocketHandler.prototype.init = function () {
@@ -71,7 +73,12 @@
 
             MynaWebsocketHandler.prototype.open = function () {
                 const wsProto = (document.location.protocol === "http:") ? "ws:" : "wss:";
-                this.connection = new WebSocket(`${wsProto}//${document.location.host}/ws/game`);
+                let wsUri = `${wsProto}//${document.location.host}/ws/game?gameId=${encodeURIComponent(this.gameId)}`;
+                if (this.myPlayerId !== null) {
+                    wsUri += `&rulesetPlayerId=${this.myPlayerId}`;
+                }
+
+                this.connection = new WebSocket(wsUri);
 
                 this.connection.addEventListener("open", function (e) {
                    this.dbg(`connection opened: ${e}`);
@@ -91,8 +98,11 @@
                 }.bind(this));
             };
 
+            const gameId = /*[[${gameId}]]*/null;
+            const myPlayerId = /*[[${myPlayerId}]]*/null;
+
             window.Myna = window.Myna || {};
-            window.Myna.wsHandler = new MynaWebsocketHandler();
+            window.Myna.wsHandler = new MynaWebsocketHandler(gameId, myPlayerId);
             window.Myna.wsHandler.init();
         })();
 

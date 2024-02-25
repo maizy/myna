@@ -13,6 +13,9 @@ import dev.maizy.myna.db.repository.GameRepository;
 import dev.maizy.myna.db.repository.RulesetRepository;
 import dev.maizy.myna.game_state.GameState;
 import dev.maizy.myna.ruleset.Player;
+import dev.maizy.myna.service.game_messages.GameMessageBus;
+import dev.maizy.myna.service.game_messages.GameMessageHandler;
+import dev.maizy.myna.service.game_messages.GameStateContext;
 import dev.maizy.myna.utils.AccessKeyGenerator;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -23,6 +26,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -57,14 +61,21 @@ public class GameStateService {
   private final GameRepository gameRepository;
   private final GamePlayerRepository gamePlayerRepository;
   private final RulesetRepository rulesetRepository;
+  private final GameMessageHandler gameMessageHandler;
+  private final ObjectProvider<GameMessageBus> gameMessageBusFactory;
 
   public GameStateService(
       GameRepository gameRepository,
       GamePlayerRepository gamePlayerRepository,
-      RulesetRepository rulesetRepository) {
+      RulesetRepository rulesetRepository,
+      GameMessageHandler gameMessageHandler,
+      ObjectProvider<GameMessageBus> gameMessageBusFactory) {
     this.gameRepository = gameRepository;
     this.gamePlayerRepository = gamePlayerRepository;
     this.rulesetRepository = rulesetRepository;
+    this.gameMessageHandler = gameMessageHandler;
+    this.gameMessageBusFactory = gameMessageBusFactory;
+
     this.gibberish = new Gibberish();
     this.accessKeyGenerator = new AccessKeyGenerator();
   }
@@ -130,6 +141,8 @@ public class GameStateService {
             .filter(player -> player.getId().getRulesetPlayerId().equals(id))
             .findFirst()
     );
+
+    onGameStateChange(gameEntity, null);
 
     return new GameAccessAuth(gameEntity, maybeOwnerPlayer.orElse(null));
   }
@@ -240,6 +253,7 @@ public class GameStateService {
         "The game has already started"
     );
 
+    final var previousState = game.getState();
     game.setState(GameState.launched);
     final GameEntity updatedGame;
     try {
@@ -250,6 +264,7 @@ public class GameStateService {
           dbError
       );
     }
+    onGameStateChange(updatedGame, previousState);
     return gameAccessAuth.withGame(updatedGame);
   }
 
@@ -278,6 +293,7 @@ public class GameStateService {
         "The game has already ended"
     );
 
+    final var previousState = game.getState();
     game.setState(GameState.finished);
     game.setFinishedAt(ZonedDateTime.now());
 
@@ -290,6 +306,8 @@ public class GameStateService {
           dbError
       );
     }
+
+    onGameStateChange(updatedGame, previousState);
     return gameAccessAuth.withGame(updatedGame);
   }
 
@@ -323,6 +341,12 @@ public class GameStateService {
     if (!allowedCurrentStates.contains(game.getState())) {
       throw new GameStateServiceErrors.GameStateChangeForbidden(game, allowedCurrentStates, toState);
     }
+  }
+
+  private void onGameStateChange(GameEntity game, GameState previousState) {
+    final var context = new GameStateContext(game);
+    final var bus = gameMessageBusFactory.getObject(null, game.getId());
+    gameMessageHandler.onGameStateChange(context, previousState, game.getState(), bus);
   }
 
 }
