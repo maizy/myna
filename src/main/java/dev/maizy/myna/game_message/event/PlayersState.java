@@ -22,11 +22,11 @@ public abstract class PlayersState implements Event {
   @Value.Immutable
   @JsonSerialize(as = ImmutablePlayerWithStatus.class)
   @JsonDeserialize(as = ImmutablePlayerWithStatus.class)
-  public static abstract class PlayerWithStatus {
+  public abstract static class PlayerWithStatus {
     @Value.Parameter
-    abstract public Player player();
+    public abstract Player player();
     @Value.Parameter
-    abstract public PlayerStatus status();
+    public abstract PlayerStatus status();
   }
 
   @Override

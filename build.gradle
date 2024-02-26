@@ -2,6 +2,7 @@ plugins {
   id 'java'
   id 'org.springframework.boot' version '2.7.17'
   id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+  id 'checkstyle'
 }
 
 group = 'dev.maizy'
@@ -73,4 +74,11 @@ bootRun {
 
 tasks.named('test') {
   useJUnitPlatform()
+}
+
+tasks.withType(Checkstyle) {
+  reports {
+    xml.required = false
+    html.required = false
+  }
 }

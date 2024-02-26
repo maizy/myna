@@ -7,11 +7,10 @@ package dev.maizy.myna.ruleset.state_change;
 
 import java.util.List;
 
-public class Fixed<S> extends StateChangeStrategy<S> {
+public class Fixed<S> implements StateChangeStrategy<S> {
   private final S fixedState;
 
   public Fixed(List<S> states) {
-    super(states);
     fixedState = states.get(0);
   }
 

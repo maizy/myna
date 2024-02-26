@@ -16,14 +16,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class UriService {
 
-  final private ServletContext servletContext;
+  private final ServletContext servletContext;
 
   private int servletPort = 12813;
-  final private String servletHost;
+  private final String servletHost;
 
-  final private String scheme;
+  private final String scheme;
 
-  final private String host;
+  private final String host;
   private Integer port = null;
   private boolean updatePortFromServletPort = false;
 

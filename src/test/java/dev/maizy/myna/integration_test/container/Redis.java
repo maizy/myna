@@ -8,7 +8,7 @@ import com.redis.testcontainers.RedisContainer;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.testcontainers.utility.DockerImageName;
 
-public class Redis {
+public final class Redis {
 
   public static final String version = "7.2.3-alpine";
   public static final String redisPass = "testpass";
@@ -19,9 +19,12 @@ public class Redis {
           .withCommand("redis-server", "--requirepass", redisPass);
   }
 
-  static public void use(RedisContainer instance, DynamicPropertyRegistry registry) {
+  public static void use(RedisContainer instance, DynamicPropertyRegistry registry) {
     registry.add("spring.redis.host", instance::getHost);
     registry.add("spring.redis.port", () -> instance.getMappedPort(6379).toString());
     registry.add("spring.redis.password", () -> redisPass);
+  }
+
+  private Redis() {
   }
 }

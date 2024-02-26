@@ -19,7 +19,11 @@ public enum ObjectStateChangeStrategy {
   shuffled_sequential(o -> new ShuffledSequential<>(o.states())),
   random(o -> new Random<>(o.states()));
 
-  public final ObjectStrateStrategyBuilder stategyBuilder;
+  private final ObjectStrateStrategyBuilder stategyBuilder;
+
+  public ObjectStrateStrategyBuilder getStategyBuilder() {
+    return stategyBuilder;
+  }
 
   ObjectStateChangeStrategy(ObjectStrateStrategyBuilder stategyBuilder) {
     this.stategyBuilder = stategyBuilder;

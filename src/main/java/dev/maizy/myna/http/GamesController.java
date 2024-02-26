@@ -26,8 +26,8 @@ public class GamesController {
 
   private static final Logger log = LoggerFactory.getLogger(GamesController.class);
 
-  final private GameStateService gameStateService;
-  final private RulesetRepository rulesetRepository;
+  private final GameStateService gameStateService;
+  private final RulesetRepository rulesetRepository;
 
   public GamesController(GameStateService gameStateService, RulesetRepository rulesetRepository) {
     this.gameStateService = gameStateService;

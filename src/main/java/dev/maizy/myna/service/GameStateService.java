@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameStateService {
 
-  public record GameAccessAuth(GameEntity game, @Nullable GamePlayerEntity player){
+  public record GameAccessAuth(GameEntity game, @Nullable GamePlayerEntity player) {
 
     public GameAccessAuth {
       Objects.requireNonNull(game);

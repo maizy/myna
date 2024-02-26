@@ -24,7 +24,7 @@ public class GameStateServiceErrors {
   }
 
   public static class GameNotFound extends GameStateServiceException {
-    final private String gameId;
+    private final String gameId;
 
     public GameNotFound(String gameId) {
       super("Game not found");
@@ -38,7 +38,7 @@ public class GameStateServiceErrors {
 
 
   public static class Forbidden extends GameStateServiceException {
-    final private GameEntity game;
+    private final GameEntity game;
 
     public Forbidden(GameEntity game) {
       this.game = game;
@@ -55,7 +55,7 @@ public class GameStateServiceErrors {
   }
 
   public static class NotValidJoinKey extends Forbidden {
-    final private String joinKey;
+    private final String joinKey;
 
     public NotValidJoinKey(GameEntity game, String joinKey) {
       super(game);
@@ -68,7 +68,7 @@ public class GameStateServiceErrors {
   }
 
   public static class ForbiddenInCurrentGameState extends Forbidden {
-    final private List<GameState> allowedStates;
+    private final List<GameState> allowedStates;
 
     public ForbiddenInCurrentGameState(GameEntity game, List<GameState> allowedStates) {
       super(game);
@@ -86,8 +86,8 @@ public class GameStateServiceErrors {
   }
 
   public static class GameStateChangeForbidden extends Forbidden {
-    final private List<GameState> allowedCurrentStates;
-    final private GameState toState;
+    private final List<GameState> allowedCurrentStates;
+    private final GameState toState;
 
     public GameStateChangeForbidden(GameEntity game, List<GameState> allowedCurrentStates, GameState toState) {
       super(game);

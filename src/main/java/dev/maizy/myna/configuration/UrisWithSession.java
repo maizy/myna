@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class UrisWithSession {
+public final class UrisWithSession {
   public static final String[] resources = {"/whoami"};
   private static final Set<String> resourcesSet = new HashSet<>(Arrays.asList(resources));
 
@@ -29,5 +29,8 @@ public class UrisWithSession {
       return true;
     }
     return Arrays.stream(resourcesPrefixes).anyMatch(p -> noSlashUri.equals(p) || uri.startsWith(p + "/"));
+  }
+
+  private UrisWithSession() {
   }
 }

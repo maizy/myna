@@ -20,4 +20,6 @@ jobs:
         distribution: 'adopt-hotspot'
         cache: 'gradle'
     - name: run tests
-      run: ./gradlew cleanTest test -i
+      run: ./gradlew cleanTest test --info
+    - name: check code style
+      run: ./gradlew check --exclude-task test --info --rerun-tasks

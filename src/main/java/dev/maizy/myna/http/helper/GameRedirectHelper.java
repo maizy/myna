@@ -9,9 +9,9 @@ import dev.maizy.myna.service.GameStateService;
 import java.nio.charset.StandardCharsets;
 import org.springframework.web.util.UriUtils;
 
-public class GameRedirectHelper {
+public final class GameRedirectHelper {
 
-  static public String redirectBasedOnGameState(GameEntity game) {
+  public static String redirectBasedOnGameState(GameEntity game) {
     return switch (game.getState()) {
       case created, upcomming ->
           "redirect:/game/" + encode(game.getId()) + "/lobby";
@@ -22,7 +22,7 @@ public class GameRedirectHelper {
     };
   }
 
-  static public String redirectBasedOnGameState(GameStateService.GameAccessAuth gameAccessAuth) {
+  public static String redirectBasedOnGameState(GameStateService.GameAccessAuth gameAccessAuth) {
     final var baseRedirect = redirectBasedOnGameState(gameAccessAuth.game());
     if (gameAccessAuth.player() != null) {
       return baseRedirect + "/" + encode(gameAccessAuth.player().getId().getRulesetPlayerId());
@@ -30,7 +30,10 @@ public class GameRedirectHelper {
     return baseRedirect;
   }
 
-  static private String encode(String pathSegment) {
+  private static String encode(String pathSegment) {
     return UriUtils.encodePathSegment(pathSegment, StandardCharsets.UTF_8);
+  }
+
+  private GameRedirectHelper() {
   }
 }

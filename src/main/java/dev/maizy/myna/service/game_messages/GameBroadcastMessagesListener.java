@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class GameBroadcastMessagesListener implements MessageListener {
   private static final Logger log = LoggerFactory.getLogger(GameBroadcastMessagesListener.class);
 
-  final private String gameId;
+  private final String gameId;
 
   private GameMessageHandler gameMessageHandler;
   private ObjectMapper objectMapper;

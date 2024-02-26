@@ -10,8 +10,10 @@ import dev.maizy.myna.surface.ImmutableRectangle;
 import dev.maizy.myna.surface.ImmutableRectangleAppearance;
 import dev.maizy.myna.surface.ImmutableSize;
 
-public class SampleRulesets {
-  static public Ruleset allFeaturesRuleset() {
+public final class SampleRulesets {
+
+  @SuppressWarnings("checkstyle:MethodLength")
+  public static Ruleset allFeaturesRuleset() {
     final ObjectsGroup rootObjects = ImmutableObjectsGroup.builder()
         .addObject(
             ImmutableGameObject.builder()
@@ -89,7 +91,7 @@ public class SampleRulesets {
         )
         .appearance(
             ImmutableRectangleAppearance.builder()
-                .backgroundColor(Colors.yellow.hex)
+                .backgroundColor(Colors.yellow.hex())
                 .build()
         )
         .build();
@@ -210,7 +212,7 @@ public class SampleRulesets {
         .build();
   }
 
-  static public Ruleset checkersRuleset() {
+  public static Ruleset checkersRuleset() {
     // TODO: position all checkers on the board
     final var black = ImmutableObjectState.builder()
         .id("black")
@@ -256,7 +258,7 @@ public class SampleRulesets {
         )
         .appearance(
             ImmutableRectangleAppearance.builder()
-                .backgroundColor(Colors.yellow.hex)
+                .backgroundColor(Colors.yellow.hex())
                 .build()
         )
         .build();
@@ -278,5 +280,8 @@ public class SampleRulesets {
         .addPlayers(whites, blacks)
         .rootObjects(rootObjectsBuilder.build())
         .build();
+  }
+
+  private SampleRulesets() {
   }
 }

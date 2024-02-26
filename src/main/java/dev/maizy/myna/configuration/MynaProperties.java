@@ -39,7 +39,8 @@ public class MynaProperties {
     @Nullable
     private Integer port;
 
-    public BaseUri() {}
+    public BaseUri() {
+    }
 
     public String getScheme() {
       return scheme;

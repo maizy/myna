@@ -26,8 +26,8 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/game")
 public class GameController {
 
-  final private GameStateService gameStateService;
-  final private UriService uriService;
+  private final GameStateService gameStateService;
+  private final UriService uriService;
 
   public GameController(GameStateService gameStateService, UriService uriService) {
     this.gameStateService = gameStateService;

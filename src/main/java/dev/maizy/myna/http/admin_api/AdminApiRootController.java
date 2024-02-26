@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AdminApiRootController {
 
-  final UriService uriService;
+  private final UriService uriService;
 
   public AdminApiRootController(UriService uriService) {
     this.uriService = uriService;

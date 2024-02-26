@@ -18,10 +18,14 @@ public enum Colors {
   magenta(ImmutableColor.of("f0609e")),
   yellow(ImmutableColor.of("fbad18"));
 
-  public final Color hex;
+  private final Color hex;
 
   Colors(Color hex) {
     this.hex = hex;
+  }
+
+  public Color hex() {
+    return hex;
   }
 
   private static final Map<String, Color> byCode = new HashMap<>();

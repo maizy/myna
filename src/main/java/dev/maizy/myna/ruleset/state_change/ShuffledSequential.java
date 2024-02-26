@@ -11,12 +11,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ShuffledSequential<S> extends StateChangeStrategy<S> {
+public class ShuffledSequential<S> implements StateChangeStrategy<S> {
 
-  final private Iterator<S> statesIterator;
+  private final Iterator<S> statesIterator;
 
   public ShuffledSequential(List<S> states) {
-    super(states);
     var shuffled = new ArrayList<>(states);
     Collections.shuffle(shuffled);
     statesIterator = Stream.generate(() -> states).flatMap(List::stream).iterator();

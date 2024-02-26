@@ -12,8 +12,9 @@ import org.junit.jupiter.api.Test;
 
 class StateChangeStrategyTest {
 
-  private record State(String code){}
-  final private List<State> testStates = List.of(new State("a"), new State("b"), new State("c"));
+  private record State(String code) {
+  }
+  private final List<State> testStates = List.of(new State("a"), new State("b"), new State("c"));
 
   @Test
   void testFixedStrategy() {

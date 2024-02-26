@@ -14,7 +14,7 @@ import org.springframework.lang.Nullable;
 @Value.Immutable
 @JsonSerialize(as = ImmutableRedisBusMessage.class)
 @JsonDeserialize(as = ImmutableRedisBusMessage.class)
-abstract public class RedisBusMessage {
+public abstract class RedisBusMessage {
 
   @Nullable
   @Value.Default

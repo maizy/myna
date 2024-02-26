@@ -21,7 +21,7 @@ public abstract class Zone {
   @Value.Default
   public RectangleAppearance appearance() {
     return ImmutableRectangleAppearance.builder()
-        .backgroundColor(Colors.white.hex)
+        .backgroundColor(Colors.white.hex())
         .build();
   }
 

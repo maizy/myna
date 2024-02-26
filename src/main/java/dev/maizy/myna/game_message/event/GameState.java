@@ -14,7 +14,7 @@ import org.springframework.lang.Nullable;
 @Value.Immutable
 @JsonSerialize(as = ImmutableGameState.class)
 @JsonDeserialize(as = ImmutableGameState.class)
-abstract public class GameState implements Event {
+public abstract class GameState implements Event {
 
   @Override
   public abstract String gameId();

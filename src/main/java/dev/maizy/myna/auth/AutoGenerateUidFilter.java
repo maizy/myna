@@ -16,7 +16,7 @@ import org.springframework.web.filter.GenericFilterBean;
 
 public class AutoGenerateUidFilter extends GenericFilterBean {
 
-  static public String UID_SESSION_KEY = "uid";
+  public static final String UID_SESSION_KEY = "uid";
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

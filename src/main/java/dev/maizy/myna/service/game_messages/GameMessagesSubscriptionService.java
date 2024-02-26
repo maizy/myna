@@ -23,7 +23,8 @@ import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorato
 @Service
 public class GameMessagesSubscriptionService {
 
-  public record PlayerWsSession(long id, String rolesetPlayerId, ConcurrentWebSocketSessionDecorator wsSession){}
+  public record PlayerWsSession(long id, String rolesetPlayerId, ConcurrentWebSocketSessionDecorator wsSession) {
+  }
 
   private static final Logger log = LoggerFactory.getLogger(GameMessagesSubscriptionService.class);
 

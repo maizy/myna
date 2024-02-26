@@ -9,9 +9,9 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 
 public class PreconfiguratedTokensFilter extends AbstractPreAuthenticatedProcessingFilter {
 
-  static public String AUTHORIZATION_HEADER = "Authorization";
-  static public String BEARER_PREFIX = "Bearer ";
-  static public Object NA = new Object();
+  public static final String AUTHORIZATION_HEADER = "Authorization";
+  public static final String BEARER_PREFIX = "Bearer ";
+  public static final Object NA = new Object();
 
   @Override
   protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {

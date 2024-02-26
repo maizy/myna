@@ -20,7 +20,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameMessageHandler {
 
-  public void onPlayerMessageReceived(PlayerMessage event, GameMessageBus bus) {}
+  public void onPlayerMessageReceived(PlayerMessage event, GameMessageBus bus) {
+  }
 
   public void onPlayerConnected(PlayerWebsocketContext wsContext, GameMessageBus bus) {
     wsContext.rulesetPlayer().ifPresent(player -> {

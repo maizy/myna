@@ -14,15 +14,15 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutablePlayerState.class)
 @JsonDeserialize(as = ImmutablePlayerState.class)
-abstract public class PlayerState implements Event {
+public abstract class PlayerState implements Event {
 
   @Override
   public abstract String gameId();
 
   @Override
-  abstract public EventType eventType();
+  public abstract EventType eventType();
 
-  abstract public Player player();
+  public abstract Player player();
 
   @Value.Check
   protected void check() {

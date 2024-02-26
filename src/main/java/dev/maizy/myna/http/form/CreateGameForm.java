@@ -37,10 +37,10 @@ public class CreateGameForm {
 
   @Override
   public String toString() {
-    return "CreateGameForm{" +
-        "me='" + me + '\'' +
-        ", rulesetId='" + rulesetId + '\'' +
-        ", playerName=" + playerName +
-        '}';
+    return "CreateGameForm{"
+        + "me='" + me + '\''
+        + ", rulesetId='" + rulesetId + '\''
+        + ", playerName=" + playerName
+        + '}';
   }
 }

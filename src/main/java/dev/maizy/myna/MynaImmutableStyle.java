@@ -12,4 +12,5 @@ import org.immutables.value.Value;
     forceJacksonPropertyNames = false,
     depluralize = true
 )
-public @interface MynaImmutableStyle {}
+public @interface MynaImmutableStyle {
+}

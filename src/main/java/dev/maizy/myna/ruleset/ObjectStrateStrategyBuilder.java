@@ -8,4 +8,5 @@ package dev.maizy.myna.ruleset;
 import dev.maizy.myna.ruleset.state_change.StateChangeStrategy;
 import java.util.function.Function;
 
-public interface ObjectStrateStrategyBuilder extends Function<GameObject, StateChangeStrategy<ObjectState>> {}
+public interface ObjectStrateStrategyBuilder extends Function<GameObject, StateChangeStrategy<ObjectState>> {
+}

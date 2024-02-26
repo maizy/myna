@@ -4,13 +4,6 @@ package dev.maizy.myna.ruleset.state_change;
  * See LICENSE.txt for details.
  */
 
-import java.util.List;
-
-abstract public class StateChangeStrategy<T> {
-  protected final List<T> states;
-  public StateChangeStrategy(List<T> states) {
-    this.states = states;
-  }
-
-  abstract public T nextState();
+public interface StateChangeStrategy<T> {
+  T nextState();
 }

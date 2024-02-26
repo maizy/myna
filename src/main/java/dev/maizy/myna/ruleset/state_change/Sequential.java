@@ -9,12 +9,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Sequential<S> extends StateChangeStrategy<S> {
+public class Sequential<S> implements StateChangeStrategy<S> {
 
-  final private Iterator<S> statesIterator;
+  private final Iterator<S> statesIterator;
 
   public Sequential(List<S> states) {
-    super(states);
     statesIterator = Stream.generate(() -> states).flatMap(List::stream).iterator();
   }
 

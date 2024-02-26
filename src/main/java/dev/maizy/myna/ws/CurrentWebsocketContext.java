@@ -7,7 +7,7 @@ package dev.maizy.myna.ws;
 import java.io.IOException;
 import org.springframework.web.socket.WebSocketSession;
 
-public class CurrentWebsocketContext {
+public final class CurrentWebsocketContext {
 
   public static WebsocketContext getWebsocketContext(WebSocketSession wsSession) {
     final var attr = wsSession.getAttributes().get(GameAccessWebsocketInterceptor.contextKey);
@@ -19,5 +19,8 @@ public class CurrentWebsocketContext {
     } catch (IOException e) {
     }
     throw new IllegalArgumentException("Game websocket context not found");
+  }
+
+  private CurrentWebsocketContext() {
   }
 }

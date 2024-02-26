@@ -14,7 +14,7 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableColor.class)
 @JsonDeserialize(as = ImmutableColor.class)
 public abstract class Color {
-  final private Pattern format = Pattern.compile("^[0-9a-f]{6}$");
+  private final Pattern format = Pattern.compile("^[0-9a-f]{6}$");
 
   @Value.Parameter
   public abstract String hex();
