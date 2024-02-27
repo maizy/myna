@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/layout::content('New Game', ~{::#content})}">
+      th:replace="~{layout/layout::content(content=~{::#content}, title='New Game')}">
 <body>
 <div id="content">
     <h1 class="mt-md-2">New Game</h1>

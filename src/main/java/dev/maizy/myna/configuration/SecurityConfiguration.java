@@ -50,17 +50,34 @@ public class SecurityConfiguration {
   @Bean
   @Order(2)
   public SecurityFilterChain withSessionFilterChain(HttpSecurity http) throws Exception {
+    final var httpSecurity = http.requestMatchers()
+        .mvcMatchers(UrisWithSession.mvcRulesWithCsrfProtection)
+        .and();
+    configureHttpSecurityWithSession(httpSecurity);
+    return http.build();
+  }
+
+  @Bean
+  @Order(3)
+  public SecurityFilterChain withSessionFilterChainWithoutCsrf(HttpSecurity http) throws Exception {
+
+    final var httpSecurity = http.requestMatchers()
+        .mvcMatchers(UrisWithSession.mvcRulesWithoutCsrfProtection)
+        .and().csrf().disable();
+    configureHttpSecurityWithSession(httpSecurity);
+    return http.build();
+  }
+
+  private void configureHttpSecurityWithSession(HttpSecurity httpSecurity) throws Exception {
     final var gameAuthFilter = new AuthentificateFromUidFilter();
     gameAuthFilter.setAuthenticationManager(new AuthentificateByUidAuthenticationManager());
-
-    http.requestMatchers().mvcMatchers(UrisWithSession.mvcRules)
-        .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+    httpSecurity
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and().sessionManagement().sessionFixation().none()
         .and()
         .addFilter(gameAuthFilter)
         .addFilterBefore(new AutoGenerateUidFilter(), AuthentificateFromUidFilter.class)
         .anonymous().disable();
-    return http.build();
   }
 
   @Bean

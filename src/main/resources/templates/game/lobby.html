@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/layout::content('Lobby', ~{::#content})}">
+      th:replace="~{layout/layout::content(content=~{::#content}, title='Lobby', headScripts=~{::head/script})}">
+<head>
+    <script th:src="@{/static/js/utils.js}"></script>
+    <script th:src="@{/static/js/game-message-bus.js}"></script>
+    <script th:src="@{/static/js/players.js}"></script>
+</head>
 <body>
 <div id="content">
     <h1 class="mt-md-2"><span th:if="${rulesetName} != null" th:text="${rulesetName}"></span> game</h1>
@@ -19,7 +24,10 @@
       </thead>
       <tbody>
         <tr th:each="player : ${players}">
-          <td class="text-center"><i class="bi bi-person-arms-up" th:if="${player.me}"></i></td>
+          <td class="text-center">
+              <i th:class="'bi ' + (${player.me} ? 'bi-person-arms-up' :'bi-question')"
+                 th:id="'player-status__' + ${player.id}"></i>
+          </td>
           <td th:text="${player.roleName}">Master</td>
           <td th:text="${player.name}">Anonymous</td>
           <td th:if="${isOwner}">
@@ -35,77 +43,20 @@
         <button class="btn btn-primary btn-lg" type="submit" name="action" value="start">Start game</button>
     </form>
 
-    <hr/>
-
-    <button id="startWs">Start WS</button>
-    <button id="sendMessage">Send message</button>
-
-    <div id="results" class="row"></div>
-
     <script th:inline="javascript">
-        (function() {
-            function MynaWebsocketHandler(gameId, myPlayerId) {
-                this.connection = null;
-                this.gameId = gameId;
-                this.myPlayerId = myPlayerId;
-            }
-
-            MynaWebsocketHandler.prototype.init = function () {
-                this.$startWs = document.getElementById("startWs");
-                this.$sendMessage = document.getElementById("sendMessage");
-                this.$result = document.getElementById("results");
-
-                this.$startWs.addEventListener("click", this.open.bind(this));
-                this.$sendMessage.addEventListener("click", function () {
-                   if (this.connection !== null) {
-                       const message = "" + (+new Date());
-                       this.connection.send(message);
-                       this.dbg(`send message: ${message}`)
-                   } else {
-                       this.dbg("unable to send message, connection is closed");
-                   }
-                }.bind(this));
-            };
-
-            MynaWebsocketHandler.prototype.dbg = function (message) {
-                this.$result.innerText += `\n${message}`;
-            };
-
-            MynaWebsocketHandler.prototype.open = function () {
-                const wsProto = (document.location.protocol === "http:") ? "ws:" : "wss:";
-                let wsUri = `${wsProto}//${document.location.host}/ws/game?gameId=${encodeURIComponent(this.gameId)}`;
-                if (this.myPlayerId !== null) {
-                    wsUri += `&rulesetPlayerId=${this.myPlayerId}`;
-                }
-
-                this.connection = new WebSocket(wsUri);
-
-                this.connection.addEventListener("open", function (e) {
-                   this.dbg(`connection opened: ${e}`);
-                }.bind(this));
-
-                this.connection.addEventListener("error", function (e) {
-                   this.dbg(`error: ${e}`);
-                }.bind(this));
-
-                this.connection.addEventListener("close", function (e) {
-                   this.dbg(`connection closed: ${e}`);
-                   this.connection = null;
-                }.bind(this));
-
-                this.connection.addEventListener("message", function (e) {
-                   this.dbg(`message received: ${e.data}`);
-                }.bind(this));
-            };
-
+        (function () {
             const gameId = /*[[${gameId}]]*/null;
             const myPlayerId = /*[[${myPlayerId}]]*/null;
 
             window.Myna = window.Myna || {};
-            window.Myna.wsHandler = new MynaWebsocketHandler(gameId, myPlayerId);
-            window.Myna.wsHandler.init();
-        })();
+            window.Myna.Instances = window.Myna.Instances || {};
 
+            window.Myna.Instances.messageBus = new window.Myna.GameMessageBus(gameId, myPlayerId);
+            window.Myna.Instances.messageBus.init();
+
+            window.Myna.Instances.players = new window.Myna.Players(myPlayerId, window.Myna.Instances.messageBus);
+            window.Myna.Instances.players.init();
+        })();
     </script>
 </div>
 </body>

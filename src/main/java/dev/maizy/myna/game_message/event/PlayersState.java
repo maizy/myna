@@ -17,7 +17,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutablePlayersState.class)
 public abstract class PlayersState implements Event {
 
-  public enum PlayerStatus { played, absent }
+  public enum PlayerStatus { playing, absent }
 
   @Value.Immutable
   @JsonSerialize(as = ImmutablePlayerWithStatus.class)

@@ -66,7 +66,7 @@ class MessageJsonTest {
         ImmutablePlayersState.builder()
             .gameId("test")
             .addPlayer(ImmutablePlayerWithStatus.of(
-                ImmutablePlayer.builder().roleName("Player 1").id("p1").build(), PlayersState.PlayerStatus.played
+                ImmutablePlayer.builder().roleName("Player 1").id("p1").build(), PlayersState.PlayerStatus.playing
             ))
             .addPlayer(ImmutablePlayerWithStatus.of(
                 ImmutablePlayer.of("p2"), PlayersState.PlayerStatus.absent

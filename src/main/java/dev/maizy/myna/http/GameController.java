@@ -205,7 +205,7 @@ public class GameController {
         .stream()
         .map(player -> {
           final var playerBuilder = ImmutableLobbyPlayer.builder();
-          playerBuilder.name(player.getName());
+          playerBuilder.name(player.getName()).id(player.getId().getRulesetPlayerId());
 
           if (withLinks && (myPlayer == null || !player.getId().equals(myPlayer.getId()))) {
             var joinLinkUri = uriService.getBaseUriBuilder()

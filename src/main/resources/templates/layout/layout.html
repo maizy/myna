@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="content(title, content)" class="h-100">
-<head th:replace="~{layout/partial/head::head(${title})}"></head>
+<html lang="en" class="h-100"
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="content(content)"
+      th:with="title=${title}, headLinks=${headLinks}, headScripts=${headScripts}">
+<head th:replace="~{layout/partial/head::head(title=${title}, links=${headLinks}, scripts=${headScripts})}"></head>
 <body class="d-flex flex-column h-100">
     <main class="container flex-shrink-0" th:insert="${content}"></main>
     <footer th:replace="layout/partial/footer::footer()"></footer>

@@ -12,7 +12,7 @@ public class AccessKeyGenerator {
 
   private final Random random;
 
-  private final char[] alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+  private final char[] alphabet = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
   public static final int ACCESS_KEY_LENGTH = 42;
 

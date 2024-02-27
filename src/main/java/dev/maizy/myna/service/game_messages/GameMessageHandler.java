@@ -55,9 +55,10 @@ public class GameMessageHandler {
   private PlayersState getCurrentPlayersState(String gameId) {
     return ImmutablePlayersState.builder()
         .gameId(gameId)
-        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("test1"), PlayersState.PlayerStatus.played))
-        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("test2"), PlayersState.PlayerStatus.absent))
-        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("test3"), PlayersState.PlayerStatus.played))
+        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("master"), PlayersState.PlayerStatus.playing))
+        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("p1"), PlayersState.PlayerStatus.playing))
+        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("p2"), PlayersState.PlayerStatus.absent))
+        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("p3"), PlayersState.PlayerStatus.playing))
         .build();
   }
 

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/layout::content(${error}, ~{::#content})}">
+      th:replace="~{layout/layout::content(content=~{::#content}, title=${error})}">
 <body>
     <div id="content">
         <p class="fs-3"> <span class="text-danger">Oops!</span></p>
