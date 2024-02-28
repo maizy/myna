@@ -14,7 +14,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableStaticAccess.class)
 public abstract class StaticAccess implements Access {
 
-  public abstract static class Builder implements AccessBuilder {}
+  public abstract static class Builder implements AccessBuilder { }
 
   @Value.Default
   public boolean visibleForAll() {
@@ -31,10 +31,10 @@ public abstract class StaticAccess implements Access {
 
   @Value.Check
   void check() {
-    if(visibleForAll() && !viewers().isEmpty()) {
+    if (visibleForAll() && !viewers().isEmpty()) {
       throw new IllegalArgumentException("viewers shouldn't be specified with visibleForAll flag");
     }
-    if(ownedForAll() && !owners().isEmpty()) {
+    if (ownedForAll() && !owners().isEmpty()) {
       throw new IllegalArgumentException("viewers shouldn't be specified with visibleForAll flag");
     }
   }

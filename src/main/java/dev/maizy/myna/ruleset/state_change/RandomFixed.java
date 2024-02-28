@@ -7,11 +7,10 @@ package dev.maizy.myna.ruleset.state_change;
 
 import java.util.List;
 
-public class RandomFixed<S> extends StateChangeStrategy<S> {
+public class RandomFixed<S> implements StateChangeStrategy<S> {
   private final S fixedState;
 
   public RandomFixed(List<S> states) {
-    super(states);
     var rand = new java.util.Random();
     fixedState = states.get(rand.nextInt(states.size()));
   }

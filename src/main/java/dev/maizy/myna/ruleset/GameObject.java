@@ -24,7 +24,7 @@ public abstract class GameObject implements WithStates<ObjectState> {
 
   @Value.Check
   void check() {
-    if(states().isEmpty()) {
+    if (states().isEmpty()) {
       throw new IllegalArgumentException("game object should have at least one state");
     }
   }

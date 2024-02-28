@@ -13,6 +13,9 @@ import dev.maizy.myna.db.repository.GameRepository;
 import dev.maizy.myna.db.repository.RulesetRepository;
 import dev.maizy.myna.game_state.GameState;
 import dev.maizy.myna.ruleset.Player;
+import dev.maizy.myna.service.game_messages.GameMessageBus;
+import dev.maizy.myna.service.game_messages.GameMessageHandler;
+import dev.maizy.myna.service.game_messages.GameStateContext;
 import dev.maizy.myna.utils.AccessKeyGenerator;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -23,13 +26,22 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GameStateService {
 
-  public record GameAccessAuth(GameEntity game, @Nullable GamePlayerEntity player){
+  private static final Logger log = LoggerFactory.getLogger(GameStateService.class);
+
+  public record GameAccessAuth(GameEntity game, @Nullable GamePlayerEntity player) {
 
     public GameAccessAuth {
       Objects.requireNonNull(game);
@@ -57,14 +69,24 @@ public class GameStateService {
   private final GameRepository gameRepository;
   private final GamePlayerRepository gamePlayerRepository;
   private final RulesetRepository rulesetRepository;
+  private final GameMessageHandler gameMessageHandler;
+  private final ObjectProvider<GameMessageBus> gameMessageBusFactory;
+  private final StringRedisTemplate redisTemplate;
 
   public GameStateService(
       GameRepository gameRepository,
       GamePlayerRepository gamePlayerRepository,
-      RulesetRepository rulesetRepository) {
+      RulesetRepository rulesetRepository,
+      GameMessageHandler gameMessageHandler,
+      ObjectProvider<GameMessageBus> gameMessageBusFactory,
+      StringRedisTemplate redisTemplate) {
     this.gameRepository = gameRepository;
     this.gamePlayerRepository = gamePlayerRepository;
     this.rulesetRepository = rulesetRepository;
+    this.gameMessageHandler = gameMessageHandler;
+    this.gameMessageBusFactory = gameMessageBusFactory;
+    this.redisTemplate = redisTemplate;
+
     this.gibberish = new Gibberish();
     this.accessKeyGenerator = new AccessKeyGenerator();
   }
@@ -130,6 +152,8 @@ public class GameStateService {
             .filter(player -> player.getId().getRulesetPlayerId().equals(id))
             .findFirst()
     );
+
+    onGameStateChange(gameEntity, null);
 
     return new GameAccessAuth(gameEntity, maybeOwnerPlayer.orElse(null));
   }
@@ -240,6 +264,7 @@ public class GameStateService {
         "The game has already started"
     );
 
+    final var previousState = game.getState();
     game.setState(GameState.launched);
     final GameEntity updatedGame;
     try {
@@ -250,6 +275,7 @@ public class GameStateService {
           dbError
       );
     }
+    onGameStateChange(updatedGame, previousState);
     return gameAccessAuth.withGame(updatedGame);
   }
 
@@ -278,6 +304,7 @@ public class GameStateService {
         "The game has already ended"
     );
 
+    final var previousState = game.getState();
     game.setState(GameState.finished);
     game.setFinishedAt(ZonedDateTime.now());
 
@@ -290,6 +317,21 @@ public class GameStateService {
           dbError
       );
     }
+
+    // delete data in redis with game state
+    try {
+      redisTemplate.execute(new SessionCallback<List<Object>>() {
+        public List<Object> execute(RedisOperations redisOps) throws DataAccessException {
+          redisOps.multi();
+          RedisKeys.getAllGameKeys(game.getId()).forEach(redisOps::delete);
+          return redisOps.exec();
+        }
+      });
+    } catch (Exception e) {
+      log.error("Unable to clean redis data for gameId=" + game.getId(), e);
+    }
+
+    onGameStateChange(updatedGame, previousState);
     return gameAccessAuth.withGame(updatedGame);
   }
 
@@ -323,6 +365,12 @@ public class GameStateService {
     if (!allowedCurrentStates.contains(game.getState())) {
       throw new GameStateServiceErrors.GameStateChangeForbidden(game, allowedCurrentStates, toState);
     }
+  }
+
+  private void onGameStateChange(GameEntity game, GameState previousState) {
+    final var context = new GameStateContext(game);
+    final var bus = gameMessageBusFactory.getObject(null, game.getId());
+    gameMessageHandler.onGameStateChange(context, previousState, game.getState(), bus);
   }
 
 }

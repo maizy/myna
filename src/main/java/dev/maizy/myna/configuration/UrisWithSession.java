@@ -10,15 +10,21 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class UrisWithSession {
-  public static final String[] resources = {"/whoami"};
-  private static final Set<String> resourcesSet = new HashSet<>(Arrays.asList(resources));
+public final class UrisWithSession {
+  public static final String[] resourcesWithCsrfProtection = {"/whoami"};
+  private static final Set<String> resourcesSet = new HashSet<>(Arrays.asList(resourcesWithCsrfProtection));
 
-  public static final String[] resourcesPrefixes = {"/game", "/games"};
-  public static final String[] mvcRules = Stream.concat(
-      Arrays.stream(resourcesPrefixes).map(p -> p + "/**"),
-      Arrays.stream(resources)
+  public static final String[] resourcesPrefixesWithCsrfProtection = {"/game", "/games"};
+  public static final String[] resourcesPrefixesWithoutCsrfProtection = {"/ws"};
+  public static final String[] mvcRulesWithCsrfProtection = Stream.concat(
+      Arrays.stream(resourcesPrefixesWithCsrfProtection).map(p -> p + "/**"),
+      Arrays.stream(resourcesWithCsrfProtection)
   ).toArray(String[]::new);
+
+  public static final String[] mvcRulesWithoutCsrfProtection =
+      Arrays.stream(resourcesPrefixesWithoutCsrfProtection)
+          .map(p -> p + "/**")
+          .toArray(String[]::new);
 
   /*
    * Primitive URI matcher
@@ -28,6 +34,12 @@ public class UrisWithSession {
     if (resourcesSet.contains(noSlashUri)) {
       return true;
     }
-    return Arrays.stream(resourcesPrefixes).anyMatch(p -> noSlashUri.equals(p) || uri.startsWith(p + "/"));
+    return Stream.concat(
+        Arrays.stream(resourcesPrefixesWithCsrfProtection),
+        Arrays.stream(resourcesPrefixesWithoutCsrfProtection)
+    ).anyMatch(p -> noSlashUri.equals(p) || uri.startsWith(p + "/"));
+  }
+
+  private UrisWithSession() {
   }
 }

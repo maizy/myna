@@ -18,7 +18,7 @@ public abstract class RectangleAppearance {
 
   @Value.Default
   public Color textColor() {
-    return Colors.black.hex;
+    return Colors.black.hex();
   }
 
   public abstract Optional<Color> backgroundColor();

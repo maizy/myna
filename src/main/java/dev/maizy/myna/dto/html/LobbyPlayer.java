@@ -9,6 +9,7 @@ import org.springframework.lang.Nullable;
 
 @Value.Immutable
 public abstract class LobbyPlayer {
+  public abstract String id();
   public abstract String name();
   public abstract String roleName();
   @Nullable

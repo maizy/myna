@@ -1,8 +1,8 @@
 @MynaImmutableStyle
-package dev.maizy.myna.dto.api;
+package dev.maizy.myna.game_message;
 
 /*
- * Copyright (c) Nikita Kovalev, maizy.dev, 2023
+ * Copyright (c) Nikita Kovalev, maizy.dev, 2024
  * See LICENSE.txt for details.
  */
 

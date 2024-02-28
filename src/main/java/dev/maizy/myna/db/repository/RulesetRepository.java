@@ -16,7 +16,7 @@ public interface RulesetRepository extends CrudRepository<RulesetEntity, String>
   @Query(value = "select * from rulesets order by ruleset ->> 'name', id", nativeQuery = true)
   Page<RulesetEntity> findAll(Pageable pageable);
 
-  @Query(value ="""
+  @Query(value = """
         select
           id,
           jsonb_build_object(
@@ -29,7 +29,7 @@ public interface RulesetRepository extends CrudRepository<RulesetEntity, String>
         order by ruleset ->> 'name', id""", nativeQuery = true)
   List<RulesetEntity> findAllSummaries();
 
-  @Query(value ="""
+  @Query(value = """
         select
           id,
           jsonb_build_object(

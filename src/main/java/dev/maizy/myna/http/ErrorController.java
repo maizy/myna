@@ -4,6 +4,7 @@ package dev.maizy.myna.http;
  * See LICENSE.txt for details.
  */
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,11 +15,11 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
 
   @RequestMapping("/error")
   public String error(Model model, HttpServletRequest request) {
-    final var error = (Integer) request.getAttribute("javax.servlet.error.status_code");
+    final var error = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
     final var statusCode = error != null ? error.toString() : "500";
     model.addAttribute("status", statusCode);
     model.addAttribute("error", "Error " + statusCode);
-    model.addAttribute("message", request.getAttribute("javax.servlet.error.message"));
+    model.addAttribute("message", request.getAttribute(RequestDispatcher.ERROR_MESSAGE));
     return "error";
   }
 }

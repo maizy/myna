@@ -2,6 +2,7 @@ plugins {
   id 'java'
   id 'org.springframework.boot' version '2.7.17'
   id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+  id 'checkstyle'
 }
 
 group = 'dev.maizy'
@@ -28,12 +29,12 @@ ext {
 
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
-  implementation 'org.springframework.boot:spring-boot-starter-webflux'
   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.session:spring-session-data-redis'
   implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+  implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
   implementation 'org.webjars:bootstrap:5.3.2'
   implementation 'org.webjars.npm:bootstrap-icons:1.11.2'
@@ -52,6 +53,7 @@ dependencies {
   runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.testcontainers:junit-jupiter'
   testImplementation 'org.testcontainers:postgresql'
@@ -72,4 +74,11 @@ bootRun {
 
 tasks.named('test') {
   useJUnitPlatform()
+}
+
+tasks.withType(Checkstyle) {
+  reports {
+    xml.required = false
+    html.required = false
+  }
 }

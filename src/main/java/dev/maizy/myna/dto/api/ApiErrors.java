@@ -13,4 +13,7 @@ public final class ApiErrors {
   public static ApiError unable(String description) {
     return ImmutableApiError.builder().error(Unable.error()).description(description).build();
   }
+
+  private ApiErrors() {
+  }
 }

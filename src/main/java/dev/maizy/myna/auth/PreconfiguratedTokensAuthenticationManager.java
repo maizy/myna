@@ -8,7 +8,7 @@ import org.springframework.security.core.AuthenticationException;
 
 public class PreconfiguratedTokensAuthenticationManager implements AuthenticationManager {
 
-  final private Set<String> allowedTokens;
+  private final Set<String> allowedTokens;
 
   public PreconfiguratedTokensAuthenticationManager(Set<String> allowedTokens) {
     this.allowedTokens = allowedTokens;

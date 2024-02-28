@@ -9,6 +9,7 @@ import dev.maizy.myna.http.helper.GameRedirectHelper;
 import dev.maizy.myna.service.GameStateService;
 import dev.maizy.myna.service.GameStateServiceErrors;
 import dev.maizy.myna.service.UriService;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -26,8 +27,8 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/game")
 public class GameController {
 
-  final private GameStateService gameStateService;
-  final private UriService uriService;
+  private final GameStateService gameStateService;
+  private final UriService uriService;
 
   public GameController(GameStateService gameStateService, UriService uriService) {
     this.gameStateService = gameStateService;
@@ -205,7 +206,7 @@ public class GameController {
         .stream()
         .map(player -> {
           final var playerBuilder = ImmutableLobbyPlayer.builder();
-          playerBuilder.name(player.getName());
+          playerBuilder.name(player.getName()).id(player.getId().getRulesetPlayerId());
 
           if (withLinks && (myPlayer == null || !player.getId().equals(myPlayer.getId()))) {
             var joinLinkUri = uriService.getBaseUriBuilder()
@@ -235,14 +236,24 @@ public class GameController {
     view.addObject("gameId", game.getId());
     view.addObject("isOwner", game.isOwner(uid));
     view.addObject("rulesetName", ruleset.name());
+    view.addObject("gameState", game.getState());
+
+    final var gameUriTemplateBuilder = uriService.getBaseUriBuilder().pathSegment("game", "{gameId}", "PAGE");
+    final Map<String, String> uriParams = new HashMap<>();
+    uriParams.put("gameId", game.getId());
+
     if (myPlayer != null) {
       view.addObject("myName", myPlayer.getName());
       view.addObject("myRoleName", myPlayer.getName());
-      view.addObject("myPlayerId", myPlayer.getId().getRulesetPlayerId());
-      ruleset.getPlayerById(myPlayer.getId().getRulesetPlayerId()).ifPresent(rulesetPlayer -> {
+      final var rulesetPlayerId = myPlayer.getId().getRulesetPlayerId();
+      view.addObject("myPlayerId", rulesetPlayerId);
+      ruleset.getPlayerById(rulesetPlayerId).ifPresent(rulesetPlayer -> {
         view.addObject("myRoleName", rulesetPlayer.roleName());
       });
+      gameUriTemplateBuilder.pathSegment("{rulesetPlayerId}");
+      uriParams.put("rulesetPlayerId", rulesetPlayerId);
     }
+    view.addObject("gameUriTemplate", gameUriTemplateBuilder.encode().buildAndExpand(uriParams).toString());
   }
 
   @ExceptionHandler(GameStateServiceErrors.GameNotFound.class)

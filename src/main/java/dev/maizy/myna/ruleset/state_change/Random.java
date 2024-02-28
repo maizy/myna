@@ -7,12 +7,13 @@ package dev.maizy.myna.ruleset.state_change;
 
 import java.util.List;
 
-public class Random<S> extends StateChangeStrategy<S> {
+public class Random<S> implements StateChangeStrategy<S> {
 
-  final private java.util.Random rand = new java.util.Random();
+  private final java.util.Random rand = new java.util.Random();
+  private final List<S> states;
 
   public Random(List<S> states) {
-    super(states);
+    this.states = states;
   }
 
   public S nextState() {

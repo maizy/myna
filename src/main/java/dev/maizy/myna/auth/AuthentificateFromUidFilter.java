@@ -9,7 +9,7 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 
 public class AuthentificateFromUidFilter extends AbstractPreAuthenticatedProcessingFilter {
 
-  static public Object NA = new Object();
+  private static final Object NA = new Object();
 
   @Override
   protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {

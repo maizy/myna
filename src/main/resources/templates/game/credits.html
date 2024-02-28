@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/layout::content('Credits', ~{::#content})}">
+      th:replace="~{layout/layout::content(content=~{::#content}, title='Credits')}">
 <body>
 <div id="content">
     <h1 class="mt-md-2"><span th:if="${rulesetName} != null" th:text="${rulesetName}"></span> game</h1>

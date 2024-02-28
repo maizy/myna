@@ -4,7 +4,10 @@ package dev.maizy.myna.dto.api;
  * See LICENSE.txt for details.
  */
 
-public interface AdminApiVersion {
-  String version = "v1";
-  String prefix = "/admin/api/" + version;
+public final class AdminApiVersion {
+  public static final String version = "v1";
+  public static final String prefix = "/admin/api/" + version;
+
+  private AdminApiVersion() {
+  }
 }

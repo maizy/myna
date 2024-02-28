@@ -10,11 +10,11 @@ import java.util.Random;
 
 public class AccessKeyGenerator {
 
-  final private Random random;
+  private final Random random;
 
-  final private char[] alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+  private final char[] alphabet = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
-  static public int ACCESS_KEY_LENGTH = 42;
+  public static final int ACCESS_KEY_LENGTH = 42;
 
   public AccessKeyGenerator(Random random) {
     this.random = random;

@@ -78,7 +78,8 @@ class GameStateFlowTest {
     assertThat(body1).isEqualTo(response2.getResponseBody());
   }
 
-  private record CreatedGame(String ownerSid, String lobbyLocation){}
+  private record CreatedGame(String ownerSid, String lobbyLocation) {
+  }
 
   private CreatedGame createGame(WebTestClient webClient) {
     // get create form
