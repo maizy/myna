@@ -9,22 +9,26 @@ import dev.maizy.myna.game_message.EventType;
 import dev.maizy.myna.game_message.PlayerMessage;
 import dev.maizy.myna.game_message.event.ImmutableGameState;
 import dev.maizy.myna.game_message.event.ImmutablePlayerState;
-import dev.maizy.myna.game_message.event.ImmutablePlayerWithStatus;
-import dev.maizy.myna.game_message.event.ImmutablePlayersState;
-import dev.maizy.myna.game_message.event.PlayersState;
 import dev.maizy.myna.game_state.GameState;
-import dev.maizy.myna.ruleset.ImmutablePlayer;
+import dev.maizy.myna.service.PlayerStateService;
 import dev.maizy.myna.ws.PlayerWebsocketContext;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GameMessageHandler {
 
+  private final PlayerStateService playerStateService;
+
+  public GameMessageHandler(PlayerStateService playerStateService) {
+    this.playerStateService = playerStateService;
+  }
+
   public void onPlayerMessageReceived(PlayerMessage event, GameMessageBus bus) {
   }
 
   public void onPlayerConnected(PlayerWebsocketContext wsContext, GameMessageBus bus) {
     wsContext.rulesetPlayer().ifPresent(player -> {
+      playerStateService.setPlayerConnected(wsContext.gameId(), player.id(), wsContext.uid());
       final var message = ImmutablePlayerState.builder()
           .player(player)
           .gameId(wsContext.gameId())
@@ -33,11 +37,14 @@ public class GameMessageHandler {
       bus.broadcastMessageToAllPlayersExceptCurrent(message);
     });
 
-    bus.broadcastMessageToAllPlayers(getCurrentPlayersState(wsContext.gameId()));
+    bus.broadcastMessageToAllPlayers(
+        playerStateService.getPlayersState(wsContext.gameId(), wsContext.ruleset().players())
+    );
   }
 
   public void onPlayerDisconnected(PlayerWebsocketContext wsContext, GameMessageBus bus) {
     wsContext.rulesetPlayer().ifPresent(player -> {
+      playerStateService.setPlayerDisconnected(wsContext.gameId(), player.id());
       final var message = ImmutablePlayerState.builder()
           .player(player)
           .gameId(wsContext.gameId())
@@ -46,20 +53,9 @@ public class GameMessageHandler {
       bus.broadcastMessageToAllPlayersExceptCurrent(message);
     });
 
-     bus.broadcastMessageToAllPlayers(getCurrentPlayersState(wsContext.gameId()));
-  }
-
-  /**
-   * FIXME temp
-   */
-  private PlayersState getCurrentPlayersState(String gameId) {
-    return ImmutablePlayersState.builder()
-        .gameId(gameId)
-        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("master"), PlayersState.PlayerStatus.playing))
-        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("p1"), PlayersState.PlayerStatus.playing))
-        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("p2"), PlayersState.PlayerStatus.absent))
-        .addPlayer(ImmutablePlayerWithStatus.of(ImmutablePlayer.of("p3"), PlayersState.PlayerStatus.playing))
-        .build();
+     bus.broadcastMessageToAllPlayers(
+        playerStateService.getPlayersState(wsContext.gameId(), wsContext.ruleset().players())
+    );
   }
 
   public void onGameStateChange(

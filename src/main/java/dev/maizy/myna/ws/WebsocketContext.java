@@ -5,6 +5,7 @@ package dev.maizy.myna.ws;
  */
 
 import dev.maizy.myna.ruleset.Player;
+import dev.maizy.myna.ruleset.Ruleset;
 import dev.maizy.myna.service.GameStateService;
 import java.util.Optional;
 
@@ -34,5 +35,9 @@ public class WebsocketContext {
 
   public String getGameId() {
     return accessAuthOnConnect.game().getId();
+  }
+
+  public Ruleset getRuleset() {
+    return accessAuthOnConnect.game().getRuleset().getRuleset();
   }
 }

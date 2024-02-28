@@ -49,7 +49,7 @@ public class GameWebsocketHandler extends TextWebSocketHandler {
         context.getGameId(), context.getRulesetPlayerId().orElse(null), session
     );
     final var playerContext = new PlayerWebsocketContext(
-        wsId, context.getGameId(), context.getUid(), context.getRulesetPlayer()
+        wsId, context.getGameId(), context.getRuleset(), context.getUid(), context.getRulesetPlayer()
     );
     session.getAttributes().put(playerContextKey, playerContext);
 
