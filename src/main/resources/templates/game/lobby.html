@@ -1,63 +1,67 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/layout::content(content=~{::#content}, title='Lobby', headScripts=~{::head/script})}">
+      th:replace="~{layout/layout::content(content=~{::body}, title='Lobby', headScripts=~{::head/script})}">
 <head>
     <script th:src="@{/static/js/utils.js}"></script>
     <script th:src="@{/static/js/game-message-bus.js}"></script>
     <script th:src="@{/static/js/players.js}"></script>
+    <script th:src="@{/static/js/game-state.js}"></script>
 </head>
 <body>
-<div id="content">
-    <h1 class="mt-md-2"><span th:if="${rulesetName} != null" th:text="${rulesetName}"></span> game</h1>
-    <div class="mb-2" th:unless="${#strings.isEmpty(myName)}">Hello, <span th:text="${myName}"></span>!</div>
+<h1 class="mt-md-2"><span th:if="${rulesetName} != null" th:text="${rulesetName}"></span> game</h1>
+<div class="mb-2" th:unless="${#strings.isEmpty(myName)}">Hello, <span th:text="${myName}"></span>!</div>
 
-    <h4 class="mt-4">Players</h4>
+<h4 class="mt-4">Players</h4>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col" style="width: 5%;"></th>
-          <th scope="col">Role</th>
-          <th scope="col">Name</th>
-          <th scope="col" th:if="${isOwner}">Invite link</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:each="player : ${players}">
-          <td class="text-center">
-              <i th:class="'bi ' + (${player.me} ? 'bi-person-arms-up' :'bi-question')"
-                 th:id="'player-status__' + ${player.id}"></i>
-          </td>
-          <td th:text="${player.roleName}">Master</td>
-          <td th:text="${player.name}">Anonymous</td>
-          <td th:if="${isOwner}">
-              <code th:text="${player.joinLink}" th:if="${player.joinLink != null}"></code>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col" style="width: 5%;"></th>
+      <th scope="col">Role</th>
+      <th scope="col">Name</th>
+      <th scope="col" th:if="${isOwner}">Invite link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:each="player : ${players}">
+      <td class="text-center">
+          <i th:class="'bi ' + (${player.me} ? 'bi-person-arms-up' :'bi-question')"
+             th:id="'player-status__' + ${player.id}"></i>
+      </td>
+      <td th:text="${player.roleName}">Master</td>
+      <td th:text="${player.name}">Anonymous</td>
+      <td th:if="${isOwner}">
+          <code th:text="${player.joinLink}" th:if="${player.joinLink != null}"></code>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
-    <form th:if="${isAllowedToLaunch}"
-          th:action="@{/game/{gameId}/lobby/{myPlayerId}(gameId = ${gameId}, myPlayerId = ${myPlayerId})}"
-          class="mt-3" method="post">
-        <button class="btn btn-primary btn-lg" type="submit" name="action" value="start">Start game</button>
-    </form>
+<form th:if="${isAllowedToLaunch}"
+      th:action="@{/game/{gameId}/lobby/{myPlayerId}(gameId = ${gameId}, myPlayerId = ${myPlayerId})}"
+      class="mt-3" method="post">
+    <button class="btn btn-primary btn-lg" type="submit" name="action" value="start">Start game</button>
+</form>
+<script th:inline="javascript">
+(function () {
+    const gameId = /*[[${gameId}]]*/null;
+    const myPlayerId = /*[[${myPlayerId}]]*/null;
+    const gameUriTemplate = /*[[${gameUriTemplate}]]*/null;
+    const currentGameState = /*[[${gameState}]]*/null;
 
-    <script th:inline="javascript">
-        (function () {
-            const gameId = /*[[${gameId}]]*/null;
-            const myPlayerId = /*[[${myPlayerId}]]*/null;
+    window.Myna = window.Myna || {};
+    window.Myna.Instances = window.Myna.Instances || {};
 
-            window.Myna = window.Myna || {};
-            window.Myna.Instances = window.Myna.Instances || {};
+    window.Myna.Instances.messageBus = new window.Myna.GameMessageBus(gameId, myPlayerId);
+    window.Myna.Instances.players = new window.Myna.Players(myPlayerId, window.Myna.Instances.messageBus);
+    window.Myna.Instances.gameState = new window.Myna.GameState(
+        gameUriTemplate, currentGameState, window.Myna.Instances.messageBus
+    );
 
-            window.Myna.Instances.messageBus = new window.Myna.GameMessageBus(gameId, myPlayerId);
-            window.Myna.Instances.messageBus.init();
-
-            window.Myna.Instances.players = new window.Myna.Players(myPlayerId, window.Myna.Instances.messageBus);
-            window.Myna.Instances.players.init();
-        })();
-    </script>
-</div>
+    window.Myna.Instances.messageBus.init();
+    window.Myna.Instances.players.init();
+    window.Myna.Instances.gameState.init();
+})();
+</script>
 </body>
 </html>

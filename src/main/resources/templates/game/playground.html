@@ -4,6 +4,7 @@
     <script th:src="@{/static/js/utils.js}"></script>
     <script th:src="@{/static/js/game-message-bus.js}"></script>
     <script th:src="@{/static/js/players.js}"></script>
+    <script th:src="@{/static/js/game-state.js}"></script>
 </head>
 <body>
 <div class="container-fluid">
@@ -51,19 +52,25 @@
     </div>
 </div>
 <script th:inline="javascript">
-    (function () {
-        const gameId = /*[[${gameId}]]*/null;
-        const myPlayerId = /*[[${myPlayerId}]]*/null;
+(function () {
+    const gameId = /*[[${gameId}]]*/null;
+    const myPlayerId = /*[[${myPlayerId}]]*/null;
+    const gameUriTemplate = /*[[${gameUriTemplate}]]*/null;
+    const currentGameState = /*[[${gameState}]]*/null;
 
-        window.Myna = window.Myna || {};
-        window.Myna.Instances = window.Myna.Instances || {};
+    window.Myna = window.Myna || {};
+    window.Myna.Instances = window.Myna.Instances || {};
 
-        window.Myna.Instances.messageBus = new window.Myna.GameMessageBus(gameId, myPlayerId);
-        window.Myna.Instances.messageBus.init();
+    window.Myna.Instances.messageBus = new window.Myna.GameMessageBus(gameId, myPlayerId);
+    window.Myna.Instances.players = new window.Myna.Players(myPlayerId, window.Myna.Instances.messageBus);
+    window.Myna.Instances.gameState = new window.Myna.GameState(
+        gameUriTemplate, currentGameState, window.Myna.Instances.messageBus
+    );
 
-        window.Myna.Instances.players = new window.Myna.Players(myPlayerId, window.Myna.Instances.messageBus);
-        window.Myna.Instances.players.init();
-    })();
+    window.Myna.Instances.messageBus.init();
+    window.Myna.Instances.players.init();
+    window.Myna.Instances.gameState.init();
+})();
 </script>
 </body>
 </html>
