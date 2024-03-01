@@ -4,6 +4,7 @@ package dev.maizy.myna.service;
  * See LICENSE.txt for details.
  */
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,9 +28,19 @@ public final class RedisKeys {
     return "players-status:" + gameId;
   }
 
+  /**
+   * hash
+   * fields – itemId
+   * value – JSON with item state
+   */
+  public static String itemsState(String gameId) {
+    return "items:" + gameId;
+  }
+
   public static List<String> getAllGameKeys(String gameId) {
-    return List.of(
-        playersState(gameId)
+    return Arrays.asList(
+        playersState(gameId),
+        itemsState(gameId)
     );
   }
 

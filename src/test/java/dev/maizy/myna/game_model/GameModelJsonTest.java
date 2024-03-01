@@ -32,13 +32,16 @@ class GameModelJsonTest {
 
   @Test
   public void testModelWithOnlyGameZoneAndObjects() throws IOException {
+    var zIndex = 0;
     final var gameZone = ImmutableZone.builder()
+        .zIndex(zIndex++)
         .itemId("root")
         .appereance(ImmutableRectangleAppearance.builder().backgroundColor(Colors.white.hex()).build())
         .build();
 
     final var gameZoneRef = Ref.fromItem(gameZone);
     final var object0 = ImmutableGameObject.builder()
+        .zIndex(zIndex++)
         .itemId("obj-0")
         .container(gameZoneRef)
         .currentPosition(ImmutableRectangle.of(ImmutablePoint.of(50, 10), ImmutablePoint.of(150, 210)))
@@ -46,6 +49,7 @@ class GameModelJsonTest {
         .build();
 
     final var object1 = ImmutableGameObject.builder()
+        .zIndex(zIndex++)
         .itemId("obj-1")
         .container(gameZoneRef)
         .currentPosition(ImmutableRectangle.of(ImmutablePoint.of(0, 0), ImmutablePoint.of(10, 10)))

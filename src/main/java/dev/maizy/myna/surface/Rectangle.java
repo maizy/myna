@@ -27,8 +27,12 @@ public abstract class Rectangle {
     }
   }
 
-  @JsonProperty
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   public Size size() {
     return ImmutableSize.of(bottomRight().x() - topLeft().x(), bottomRight().y() - topLeft().y());
+  }
+
+  public static Rectangle fromTopLeftAndSize(Point topLeft, Size size) {
+    return ImmutableRectangle.of(topLeft, ImmutablePoint.of(topLeft.x() + size.width(), topLeft.y() + size.height()));
   }
 }

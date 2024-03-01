@@ -15,7 +15,7 @@ public abstract class Ref {
   @Value.Parameter
   public abstract String itemId();
 
-  public static Ref fromItem(ItemId item) {
+  public static Ref fromItem(Item item) {
     return ImmutableRef.of(item.itemId());
   }
 }

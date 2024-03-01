@@ -72,6 +72,7 @@ public class GameStateService {
   private final GameMessageHandler gameMessageHandler;
   private final ObjectProvider<GameMessageBus> gameMessageBusFactory;
   private final StringRedisTemplate redisTemplate;
+  private final GameItemsService gameItemsService;
 
   public GameStateService(
       GameRepository gameRepository,
@@ -79,13 +80,15 @@ public class GameStateService {
       RulesetRepository rulesetRepository,
       GameMessageHandler gameMessageHandler,
       ObjectProvider<GameMessageBus> gameMessageBusFactory,
-      StringRedisTemplate redisTemplate) {
+      StringRedisTemplate redisTemplate,
+      GameItemsService gameItemsService) {
     this.gameRepository = gameRepository;
     this.gamePlayerRepository = gamePlayerRepository;
     this.rulesetRepository = rulesetRepository;
     this.gameMessageHandler = gameMessageHandler;
     this.gameMessageBusFactory = gameMessageBusFactory;
     this.redisTemplate = redisTemplate;
+    this.gameItemsService = gameItemsService;
 
     this.gibberish = new Gibberish();
     this.accessKeyGenerator = new AccessKeyGenerator();
@@ -276,6 +279,7 @@ public class GameStateService {
       );
     }
     onGameStateChange(updatedGame, previousState);
+    gameItemsService.initAndSaveGameModel(game.getId(), game.getRuleset().getRuleset());
     return gameAccessAuth.withGame(updatedGame);
   }
 

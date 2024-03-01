@@ -15,11 +15,17 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableGameObject.class)
 @JsonDeserialize(as = ImmutableGameObject.class)
-public abstract class GameObject implements ItemId {
+public abstract class GameObject implements Item {
+
+  @JsonProperty("zIndex")
+  public abstract int zIndex();
 
   public abstract String itemId();
+
   public abstract RectangleAppearance currentAppereance();
+
   public abstract Rectangle currentPosition();
+
   public abstract Ref container();
 
   @Value.Default

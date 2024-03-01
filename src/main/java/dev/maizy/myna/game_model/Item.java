@@ -4,6 +4,7 @@ package dev.maizy.myna.game_model;
  * See LICENSE.txt for details.
  */
 
-public interface ItemId {
+public interface Item {
+  int zIndex();
   String itemId();
 }

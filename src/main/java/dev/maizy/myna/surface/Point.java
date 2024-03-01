@@ -19,4 +19,8 @@ public abstract class Point {
 
   @Value.Parameter
   public abstract int y();
+
+  public static Point zero() {
+    return ImmutablePoint.of(0, 0);
+  }
 }
