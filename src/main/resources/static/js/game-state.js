@@ -1,7 +1,7 @@
-(function () {
-    window.Myna = window.Myna || {};
+"use strict";
 
-    function GameState(gameUriTemplate, currentGameState, messageBus) {
+export class GameState {
+    constructor(gameUriTemplate, currentGameState, messageBus) {
         this.gameUriTemplate = gameUriTemplate;
         this.messageBus = messageBus;
         this.currentGameState = currentGameState;
@@ -13,18 +13,16 @@
         };
     }
 
-    GameState.prototype.init = function () {
-        this.messageBus.addEventListiner('game_state_changed', this.gameStateChanged.bind(this));
-    };
+    init() {
+        this.messageBus.addGameEventListiner('game_state_changed', this.gameStateChanged.bind(this));
+    }
 
-    GameState.prototype.gameStateChanged = function (event) {
+    gameStateChanged(event) {
         if (event.newState !== this.currentGameState) {
             const page = this._pagesByState[event.newState];
             if (page !== undefined) {
                 document.location = this.gameUriTemplate.replace('PAGE', page);
             }
         }
-    };
-
-    window.Myna.GameState = GameState;
-})();
+    }
+}

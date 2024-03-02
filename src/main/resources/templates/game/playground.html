@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/partial/head::head(title='Playground', scripts=~{::head/script})}">
-    <script th:src="@{/static/js/utils.js}"></script>
-    <script th:src="@{/static/js/game-message-bus.js}"></script>
-    <script th:src="@{/static/js/players.js}"></script>
-    <script th:src="@{/static/js/game-state.js}"></script>
-</head>
+<head th:replace="~{layout/partial/head::head(title='Playground')}"></head>
 <body>
 <div class="container-fluid">
     <div class="row flex-nowrap">
@@ -51,26 +46,28 @@
         </div>
     </div>
 </div>
-<script th:inline="javascript">
-(function () {
-    const gameId = /*[[${gameId}]]*/null;
-    const myPlayerId = /*[[${myPlayerId}]]*/null;
-    const gameUriTemplate = /*[[${gameUriTemplate}]]*/null;
-    const currentGameState = /*[[${gameState}]]*/null;
+<script th:inline="javascript" type="module">
+"use strict";
+import { GameMessageBus } from /*[[@{/static/js/game-message-bus.js}]]*/ "/static/js/game-message-bus.js";
+import { Players } from /*[[@{/static/js/players.js}]]*/ "/static/js/players.js";
+import { GameState } from /*[[@{/static/js/game-state.js}]]*/ "/static/js/game-state.js";
 
-    window.Myna = window.Myna || {};
-    window.Myna.Instances = window.Myna.Instances || {};
+const gameId = /*[[${gameId}]]*/ null;
+const myPlayerId = /*[[${myPlayerId}]]*/ null;
+const gameUriTemplate = /*[[${gameUriTemplate}]]*/ null;
+const currentGameState = /*[[${gameState}]]*/ null;
 
-    window.Myna.Instances.messageBus = new window.Myna.GameMessageBus(gameId, myPlayerId);
-    window.Myna.Instances.players = new window.Myna.Players(myPlayerId, window.Myna.Instances.messageBus);
-    window.Myna.Instances.gameState = new window.Myna.GameState(
-        gameUriTemplate, currentGameState, window.Myna.Instances.messageBus
-    );
+window.MynaInstances = window.MynaInstances || {};
 
-    window.Myna.Instances.messageBus.init();
-    window.Myna.Instances.players.init();
-    window.Myna.Instances.gameState.init();
-})();
+window.MynaInstances.messageBus = new GameMessageBus(gameId, myPlayerId);
+window.MynaInstances.players = new Players(myPlayerId, window.MynaInstances.messageBus);
+window.MynaInstances.gameState = new GameState(
+    gameUriTemplate, currentGameState, window.MynaInstances.messageBus
+);
+
+window.MynaInstances.messageBus.init();
+window.MynaInstances.players.init();
+window.MynaInstances.gameState.init();
 </script>
 </body>
 </html>
