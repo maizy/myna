@@ -14,8 +14,8 @@ import dev.maizy.myna.game_model.ImmutableZone;
 import dev.maizy.myna.game_model.Item;
 import dev.maizy.myna.game_model.Ref;
 import dev.maizy.myna.game_model.Zone;
+import dev.maizy.myna.ruleset.PositioningType;
 import dev.maizy.myna.ruleset.Ruleset;
-import dev.maizy.myna.surface.Point;
 import dev.maizy.myna.surface.Rectangle;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -53,20 +53,28 @@ public class GameItemsService {
         .zIndex(zIndex++)
         .itemId(gameZoneId)
         .appereance(ruleset.gameZone().appearance())
+        // root zone position is ignored, only size matters
+        .size(ruleset.gameZone().position().size())
         .build();
     gameModelBuilder.gameZone(gameZone);
 
+    if (ruleset.rootObjects().positioningType() != PositioningType.stack) {
+      throw new GameItemsServiceErrors.GameItemsServiceException(
+          gameId,
+          "Unsupported positioning type '" + ruleset.rootObjects().positioningType() + "' for root game objects"
+      );
+    }
     var objectIndex = 0;
     for (final var rulesetObj : ruleset.rootObjects().objects()) {
       final var currentState = rulesetObj.stateChangeStrategy().getStategyBuilder().apply(rulesetObj).nextState();
       final var gameObj = ImmutableGameObject.builder()
           .zIndex(zIndex++)
+          .rulesetObjectId(rulesetObj.id())
           .itemId(gameObjectId(objectIndex++))
           .isDraggable(true)
           .container(Ref.fromItem(gameZone))
           .currentAppereance(currentState.appearance())
-          // TODO: positioning objects in ruleset
-          .currentPosition(Rectangle.fromTopLeftAndSize(Point.zero(), rulesetObj.size()))
+          .currentPosition(Rectangle.fromTopLeftAndSize(rulesetObj.relativePosition(), rulesetObj.size()))
           .build();
       gameModelBuilder.addObject(gameObj);
     }

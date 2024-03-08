@@ -22,6 +22,8 @@ public abstract class GameObject implements Item {
 
   public abstract String itemId();
 
+  public abstract String rulesetObjectId();
+
   public abstract RectangleAppearance currentAppereance();
 
   public abstract Rectangle currentPosition();

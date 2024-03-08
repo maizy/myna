@@ -31,6 +31,7 @@ import org.testcontainers.junit.jupiter.Container;
 class GameStateFlowTest {
 
   private static final Logger log = LoggerFactory.getLogger(GameStateFlowTest.class);
+  public static final String testRulesetId = "checkers_v1";
 
   @Container
   private static final PostgreSQLContainer<?> postgreSQLContainer = Postgres.build();
@@ -95,7 +96,7 @@ class GameStateFlowTest {
     // create game
     final var createParams = new LinkedMultiValueMap<String, String>();
     createParams.add("_csrf", createGameCsrfToken);
-    createParams.add("rulesetId", "checkers_v0");
+    createParams.add("rulesetId", testRulesetId);
     createParams.add("me", "Whites");
     createParams.add("playerName[Whites]", "Me");
     createParams.add("playerName[Blacks]", "Competitor");

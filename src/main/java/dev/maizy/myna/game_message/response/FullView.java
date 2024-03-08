@@ -10,19 +10,19 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import dev.maizy.myna.game_message.Response;
 import dev.maizy.myna.game_message.ResponseType;
-import dev.maizy.myna.ruleset.Player;
+import dev.maizy.myna.game_model.GameModel;
 import java.util.Optional;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableWhoYouAre.class)
-@JsonDeserialize(as = ImmutableWhoYouAre.class)
-@JsonTypeName("who_you_are")
-public abstract class WhoYouAre implements Response {
+@JsonSerialize(as = ImmutableFullView.class)
+@JsonDeserialize(as = ImmutableFullView.class)
+@JsonTypeName("full_view")
+public abstract class FullView implements Response {
 
   @Override
   public ResponseType responseType() {
-    return ResponseType.who_you_are;
+    return ResponseType.full_view;
   }
 
   @Override
@@ -31,5 +31,5 @@ public abstract class WhoYouAre implements Response {
   @Override
   public abstract Optional<String> oid();
 
-  public abstract Optional<Player> player();
+  public abstract GameModel gameModel();
 }

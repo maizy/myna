@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/partial/head::head(title='Playground')}"></head>
+<head th:replace="~{layout/partial/head::head(title='Playground', scripts=~{::head/script})}">
+    <script th:src="@{/static/js/vendors/svg.min.js}"></script>
+    <script th:src="@{/static/js/vendors/svg.draggable.min.js}"></script>
+</head>
 <body>
 <div class="container-fluid">
     <div class="row flex-nowrap">
@@ -41,9 +44,7 @@
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div>🐢 Playing surface will be here ... </div>
-        </div>
+        <div class="col" id="game-surface"></div>
     </div>
 </div>
 <script th:inline="javascript" type="module">
@@ -51,6 +52,7 @@
 import { GameMessageBus } from /*[[@{/static/js/game-message-bus.js}]]*/ "/static/js/game-message-bus.js";
 import { Players } from /*[[@{/static/js/players.js}]]*/ "/static/js/players.js";
 import { GameState } from /*[[@{/static/js/game-state.js}]]*/ "/static/js/game-state.js";
+import { Surface } from /*[[@{/static/js/surface.js}]]*/ "/static/js/surface.js";
 
 const gameId = /*[[${gameId}]]*/ null;
 const myPlayerId = /*[[${myPlayerId}]]*/ null;
@@ -64,10 +66,12 @@ window.MynaInstances.players = new Players(myPlayerId, window.MynaInstances.mess
 window.MynaInstances.gameState = new GameState(
     gameUriTemplate, currentGameState, window.MynaInstances.messageBus
 );
+window.MynaInstances.surface = new Surface(window.MynaInstances.messageBus);
 
 window.MynaInstances.messageBus.init();
 window.MynaInstances.players.init();
 window.MynaInstances.gameState.init();
+window.MynaInstances.surface.init();
 </script>
 </body>
 </html>

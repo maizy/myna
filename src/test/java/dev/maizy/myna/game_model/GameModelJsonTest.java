@@ -10,6 +10,7 @@ import dev.maizy.myna.surface.Colors;
 import dev.maizy.myna.surface.ImmutablePoint;
 import dev.maizy.myna.surface.ImmutableRectangle;
 import dev.maizy.myna.surface.ImmutableRectangleAppearance;
+import dev.maizy.myna.surface.ImmutableSize;
 import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
@@ -37,12 +38,14 @@ class GameModelJsonTest {
         .zIndex(zIndex++)
         .itemId("root")
         .appereance(ImmutableRectangleAppearance.builder().backgroundColor(Colors.white.hex()).build())
+        .size(ImmutableSize.of(1024, 768))
         .build();
 
     final var gameZoneRef = Ref.fromItem(gameZone);
     final var object0 = ImmutableGameObject.builder()
         .zIndex(zIndex++)
         .itemId("obj-0")
+        .rulesetObjectId("o0")
         .container(gameZoneRef)
         .currentPosition(ImmutableRectangle.of(ImmutablePoint.of(50, 10), ImmutablePoint.of(150, 210)))
         .currentAppereance(ImmutableRectangleAppearance.builder().text("Object 1").build())
@@ -51,6 +54,7 @@ class GameModelJsonTest {
     final var object1 = ImmutableGameObject.builder()
         .zIndex(zIndex++)
         .itemId("obj-1")
+        .rulesetObjectId("o1")
         .container(gameZoneRef)
         .currentPosition(ImmutableRectangle.of(ImmutablePoint.of(0, 0), ImmutablePoint.of(10, 10)))
         .currentAppereance(ImmutableRectangleAppearance.builder().backgroundColor(Colors.black.hex()).build())

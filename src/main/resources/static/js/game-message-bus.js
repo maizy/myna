@@ -11,11 +11,14 @@ export class GameMessageBus {
             event: {},
             response: {}
         };
+        this._eventsListiners = {
+        };
         this._requests = {};
     }
 
     init() {
         this._connect();
+
     };
 
     _connect() {
@@ -27,11 +30,18 @@ export class GameMessageBus {
 
         this._connection = new WebSocket(wsUri);
 
-        this._connection.addEventListener("open", (event) => utils.debug("ws connection opened", wsUri, event));
-        this._connection.addEventListener("error", (event) => utils.debug("ws connection error", event));
+        this._connection.addEventListener("open", (event) => {
+            utils.debug("ws connection opened", wsUri, event);
+            this._triggerEvent("connected");
+        });
+        this._connection.addEventListener("error", (event) => {
+            utils.debug("ws connection error", event);
+            this._triggerEvent("connection_error");
+        });
         this._connection.addEventListener("close", (event) => {
             utils.debug("ws connection closed", event);
             this._connection = null;
+            this._triggerEvent("disconnected");
         });
         this._connection.addEventListener("message", (event) => {
             let message;
@@ -78,15 +88,13 @@ export class GameMessageBus {
         }
     }
 
-    request(message, callback) {
-        if (message.kind !== 'request') {
-            utils.error("Wrong message kind for request", message);
-            return;
-        }
+    request(payload, callback) {
         const oid = `${+new Date()}-${utils.randString(6)}`;
-        message.oid = oid;
+        payload.oid = oid;
+        payload.gameId = this.gameId;
+        payload.kind = "request";
         this._requests[oid] = callback;
-        this.send(message);
+        this.send(payload);
     }
 
     addGameEventListiner(eventType, callback) {
@@ -97,5 +105,19 @@ export class GameMessageBus {
     addResponseListiner(responseType, callback) {
         this._messageListeners.response[responseType] = this._messageListeners.response[responseType] || [];
         this._messageListeners.response[responseType].push(callback);
+    }
+
+    addEventListiner(code, callback) {
+        this._eventsListiners[code] = this._eventsListiners[code] || [];
+        this._eventsListiners[code].push(callback);
+    }
+
+    _triggerEvent(code, args) {
+        const callbacks = this._eventsListiners[code];
+        if (callbacks) {
+            for (let callback of callbacks) {
+                callback.apply(null, args);
+            }
+        }
     }
 }

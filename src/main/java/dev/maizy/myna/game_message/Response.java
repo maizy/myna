@@ -7,6 +7,7 @@ package dev.maizy.myna.game_message;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import dev.maizy.myna.game_message.response.FullView;
 import dev.maizy.myna.game_message.response.ImmutableWhoYouAre;
 import java.util.Optional;
 
@@ -17,7 +18,8 @@ import java.util.Optional;
     visible = true
 )
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = ImmutableWhoYouAre.class, names = {"who_you_are", "full_view"}),
+    @JsonSubTypes.Type(value = ImmutableWhoYouAre.class, name = "who_you_are"),
+    @JsonSubTypes.Type(value = FullView.class, name = "full_view"),
 })
 public interface Response extends Message {
 

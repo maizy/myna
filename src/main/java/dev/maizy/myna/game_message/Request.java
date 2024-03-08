@@ -17,7 +17,7 @@ import java.util.Optional;
     visible = true
 )
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = ImmutableParameterlessRequest.class, name = "who_am_i"),
+    @JsonSubTypes.Type(value = ImmutableParameterlessRequest.class, names = {"who_am_i", "get_full_view"}),
 })
 public interface Request extends Message {
 
