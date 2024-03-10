@@ -7,11 +7,23 @@ export class Surface {
         this.messageBus = messageBus;
         this.containerId = containerId || "game-surface";
         this._svg = null;
+        this._$messageLoading = null;
+        this._$messageError = null;
     }
 
     init() {
+        this._$messageError = window.document.getElementById("message-error");
+        this._$messageLoading = window.document.getElementById("message-loading");
+
         this.messageBus.addEventListiner("connected", () => {
+            this._$messageLoading.classList.remove("template");
+            this._$messageError.classList.add("template");
             this.messageBus.request({requestType: "get_full_view"}, (message) => this.repaint(message.gameModel));
+        });
+
+        this.messageBus.addEventListiner("disconnected", () => {
+            this._$messageError.innerText = "Connection lost.\nReconnecting ...";
+            this._$messageError.classList.remove("template");
         });
     }
 
@@ -38,7 +50,7 @@ export class Surface {
                 await this._addGameObject(svg, object);
             }
         }
-
+        this._$messageLoading.classList.add("template");
     }
 
     async _addGameObject(svg, object) {

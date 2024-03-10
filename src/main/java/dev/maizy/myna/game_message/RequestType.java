@@ -6,5 +6,7 @@ package dev.maizy.myna.game_message;
 
 public enum RequestType {
   get_full_view,
-  who_am_i
+  who_am_i,
+  get_game_state,
+  get_players_state
 }

@@ -13,6 +13,9 @@
                     Game
                 </h1>
 
+                <div id="message-loading" class="alert alert-primary pt-2 pb-2 small" role="alert">Loading ...</div>
+                <div id="message-error" class="alert alert-danger pt-2 pb-2 small template" role="alert">Error</div>
+
                 <div class="pt-2 pb-2 fw-bolder">Players</div>
                 <div th:class="${isOwner} ? 'flex-column' : 'flex-column mb-auto'">
                     <table class="table table-sm table-secondary">
@@ -68,10 +71,11 @@ window.MynaInstances.gameState = new GameState(
 );
 window.MynaInstances.surface = new Surface(window.MynaInstances.messageBus);
 
-window.MynaInstances.messageBus.init();
 window.MynaInstances.players.init();
 window.MynaInstances.gameState.init();
 window.MynaInstances.surface.init();
+
+window.MynaInstances.messageBus.init();
 </script>
 </body>
 </html>

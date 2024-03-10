@@ -4,9 +4,8 @@ package dev.maizy.myna.service;
  * See LICENSE.txt for details.
  */
 
-import dev.maizy.myna.game_message.event.ImmutablePlayerWithStatus;
-import dev.maizy.myna.game_message.event.ImmutablePlayersState;
-import dev.maizy.myna.game_message.event.PlayersState;
+import dev.maizy.myna.game_message.ImmutablePlayerWithStatus;
+import dev.maizy.myna.game_message.PlayerWithStatus;
 import dev.maizy.myna.ruleset.Player;
 import java.util.List;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -29,19 +28,13 @@ public class PlayerStateService {
     redisTemplate.opsForHash().delete(RedisKeys.playersState(gameId), rulesetRoleId);
   }
 
-  public PlayersState getPlayersState(String gameId, List<Player> players) {
+  public List<? extends PlayerWithStatus> getPlayersState(String gameId, List<Player> players) {
     final var states = redisTemplate.opsForHash().entries(RedisKeys.playersState(gameId));
-
-    final var playersWithStatus = players.stream().map(player -> {
+    return players.stream().map(player -> {
       final var status = (states.get(player.id()) != null)
-          ? PlayersState.PlayerStatus.playing
-          : PlayersState.PlayerStatus.absent;
+          ? PlayerWithStatus.PlayerStatus.playing
+          : PlayerWithStatus.PlayerStatus.absent;
       return ImmutablePlayerWithStatus.of(player, status);
-    }).toArray(PlayersState.PlayerWithStatus[]::new);
-
-    return ImmutablePlayersState.builder()
-        .gameId(gameId)
-        .addPlayers(playersWithStatus)
-        .build();
+    }).toList();
   }
 }

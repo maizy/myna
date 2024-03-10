@@ -14,12 +14,21 @@ export class GameState {
     }
 
     init() {
-        this.messageBus.addGameEventListiner('game_state_changed', this.gameStateChanged.bind(this));
+        this.messageBus.addGameEventListiner(
+            'game_state_changed',
+            (event) => this.gameStateChanged(event.newState)
+        );
+        this.messageBus.addEventListiner("connected", () => {
+            this.messageBus.request(
+                {requestType: "get_game_state"},
+                (message) => this.gameStateChanged(message.currentState)
+            );
+        });
     }
 
-    gameStateChanged(event) {
-        if (event.newState !== this.currentGameState) {
-            const page = this._pagesByState[event.newState];
+    gameStateChanged(state) {
+        if (state !== this.currentGameState) {
+            const page = this._pagesByState[state];
             if (page !== undefined) {
                 document.location = this.gameUriTemplate.replace('PAGE', page);
             }

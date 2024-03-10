@@ -7,11 +7,21 @@ export class Players {
     }
 
     init() {
-        this.messageBus.addGameEventListiner('players_state_changed', this.updatePlayersState.bind(this));
+        this.messageBus.addGameEventListiner(
+            'players_state_changed',
+            (event) => this.updatePlayersState(event.players)
+        );
+
+        this.messageBus.addEventListiner("connected", () => {
+            this.messageBus.request(
+                {requestType: "get_players_state"},
+                (message) => this.updatePlayersState(message.players)
+            );
+        });
     }
 
-    updatePlayersState(state) {
-        for (let player of state.players) {
+    updatePlayersState(players) {
+        for (let player of players) {
             if (player.player.id === this.myPlayerId) {
                 continue;
             }

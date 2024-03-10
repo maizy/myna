@@ -14,6 +14,7 @@ export class GameMessageBus {
         this._eventsListiners = {
         };
         this._requests = {};
+        this._reconnectTimeout = null;
     }
 
     init() {
@@ -36,12 +37,15 @@ export class GameMessageBus {
         });
         this._connection.addEventListener("error", (event) => {
             utils.debug("ws connection error", event);
-            this._triggerEvent("connection_error");
+            this._connection = null;
+            this._triggerEvent("disconnected");
+            this._reconnect();
         });
         this._connection.addEventListener("close", (event) => {
             utils.debug("ws connection closed", event);
             this._connection = null;
             this._triggerEvent("disconnected");
+            this._reconnect();
         });
         this._connection.addEventListener("message", (event) => {
             let message;
@@ -53,6 +57,16 @@ export class GameMessageBus {
             }
             this._onMessageReceived(message);
         });
+    }
+
+    _reconnect() {
+        if (this._reconnectTimeout == null) {
+            this._reconnectTimeout = setTimeout(() => {
+                utils.debug("reconnect attempt");
+                this._reconnectTimeout = null;
+                this._connect();
+            }, 1500);
+        }
     }
 
     _onMessageReceived(message) {

@@ -69,29 +69,32 @@ public class GameStateService {
   private final GameRepository gameRepository;
   private final GamePlayerRepository gamePlayerRepository;
   private final RulesetRepository rulesetRepository;
-  private final GameMessageHandler gameMessageHandler;
   private final ObjectProvider<GameMessageBus> gameMessageBusFactory;
   private final StringRedisTemplate redisTemplate;
   private final GameItemsService gameItemsService;
+
+  private GameMessageHandler gameMessageHandler = null;
 
   public GameStateService(
       GameRepository gameRepository,
       GamePlayerRepository gamePlayerRepository,
       RulesetRepository rulesetRepository,
-      GameMessageHandler gameMessageHandler,
       ObjectProvider<GameMessageBus> gameMessageBusFactory,
       StringRedisTemplate redisTemplate,
       GameItemsService gameItemsService) {
     this.gameRepository = gameRepository;
     this.gamePlayerRepository = gamePlayerRepository;
     this.rulesetRepository = rulesetRepository;
-    this.gameMessageHandler = gameMessageHandler;
     this.gameMessageBusFactory = gameMessageBusFactory;
     this.redisTemplate = redisTemplate;
     this.gameItemsService = gameItemsService;
 
     this.gibberish = new Gibberish();
     this.accessKeyGenerator = new AccessKeyGenerator();
+  }
+
+  public void subscribeToGameStateChange(GameMessageHandler gameMessageHandler) {
+    this.gameMessageHandler = gameMessageHandler;
   }
 
   @Transactional
@@ -156,7 +159,7 @@ public class GameStateService {
             .findFirst()
     );
 
-    onGameStateChange(gameEntity, null);
+    notifyMessageHandler(gameEntity, null);
 
     return new GameAccessAuth(gameEntity, maybeOwnerPlayer.orElse(null));
   }
@@ -182,6 +185,14 @@ public class GameStateService {
         });
 
     return maybeGameAccessAuth.orElseThrow(() -> new GameStateServiceErrors.Forbidden(game));
+  }
+
+  public GameState getGameState(String gameId) {
+    final var maybeState = gameRepository.getStateById(gameId);
+    if (maybeState.isEmpty()) {
+      throw new GameStateServiceErrors.GameNotFound(gameId);
+    }
+    return maybeState.get();
   }
 
   public GameAccessAuth checkGameAccessAuthByUidAndPlayerId(String gameId, String uid, String rulesetPlayerId) {
@@ -278,7 +289,7 @@ public class GameStateService {
           dbError
       );
     }
-    onGameStateChange(updatedGame, previousState);
+    notifyMessageHandler(updatedGame, previousState);
     gameItemsService.initAndSaveGameModel(game.getId(), game.getRuleset().getRuleset());
     return gameAccessAuth.withGame(updatedGame);
   }
@@ -335,7 +346,7 @@ public class GameStateService {
       log.error("Unable to clean redis data for gameId=" + game.getId(), e);
     }
 
-    onGameStateChange(updatedGame, previousState);
+    notifyMessageHandler(updatedGame, previousState);
     return gameAccessAuth.withGame(updatedGame);
   }
 
@@ -371,10 +382,12 @@ public class GameStateService {
     }
   }
 
-  private void onGameStateChange(GameEntity game, GameState previousState) {
-    final var context = new GameStateContext(game);
-    final var bus = gameMessageBusFactory.getObject(null, game.getId());
-    gameMessageHandler.onGameStateChange(context, previousState, game.getState(), bus);
+  private void notifyMessageHandler(GameEntity game, GameState previousState) {
+    if (this.gameMessageHandler != null) {
+      final var context = new GameStateContext(game);
+      final var bus = gameMessageBusFactory.getObject(null, game.getId());
+      gameMessageHandler.onGameStateChange(context, previousState, game.getState(), bus);
+    }
   }
 
 }
