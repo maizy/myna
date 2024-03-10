@@ -9,6 +9,8 @@ export class Surface {
         this._svg = null;
         this._$messageLoading = null;
         this._$messageError = null;
+
+        this._byItemId = {};
     }
 
     init() {
@@ -40,9 +42,11 @@ export class Surface {
         const gameZone = gameModel.gameZone;
         const svg = SVG();
         this._svg = svg;
+        this._byItemId = {};
         svg.addTo(`#${this.containerId}`).size(gameZone.size.width, gameZone.size.height);
         const gameZoneGroup = svg.nested();
         await this._drawItem(gameZoneGroup, {size: gameZone.size}, gameZone.appereance);
+        this._byItemId[gameZone.itemId] = gameZoneGroup;
         if (gameModel.objects) {
             const sortedObjects = [...gameModel.objects];
             sortedObjects.sort((a, b) => a.zIndex - b.zIndex);
@@ -56,6 +60,62 @@ export class Surface {
     async _addGameObject(svg, object) {
         const objectGroup = svg.nested();
         await this._drawItem(objectGroup, object.currentPosition, object.currentAppereance);
+        objectGroup.css('cursor', 'pointer');
+        this._byItemId[object.itemId] = objectGroup;
+        if (object.isDraggable) {
+            objectGroup.draggable();
+            const dragzoneId = object.draggableZone ? object.draggableZone.itemId : 'root';
+            objectGroup.on('dragmove.namespace', (e) => this._dragObject(dragzoneId, e));
+
+            objectGroup.on('beforedrag.namespace', (e) => {
+               utils.debug("before drag", e);
+            });
+
+            objectGroup.on('dragstart.namespace', (e) => {
+               utils.debug("drag start", e);
+            });
+
+            objectGroup.on('dragend.namespace', (e) => {
+               utils.debug("drag end", e);
+            });
+        }
+    }
+
+    _dragObject(dragzoneId, e) {
+        const draggableZone = this._byItemId[dragzoneId];
+        e.preventDefault();
+        if (!draggableZone) {
+            return;
+        }
+        const {handler, box: diff} = e.detail;
+        const constraints = draggableZone.bbox();
+        const el = handler.el;
+
+        const {w, h} = el.bbox(); // only width & height are relevant for bbox here
+        const x = el.x(),
+              y = el.y();
+
+        let newX = x + diff.x;
+        let newY = y + diff.y;
+        const newX2 = x + w + diff.x;
+        const newY2 = y + h + diff.y;
+
+        // top left constraint
+        if (newX < constraints.x) {
+            newX = constraints.x;
+        }
+        if (newY < constraints.y) {
+            newY = constraints.y;
+        }
+
+        // bottom right constraint
+        if (newX2 > constraints.x2) {
+            newX = constraints.x2 - w;
+        }
+        if (newY2 > constraints.y2) {
+            newY = constraints.y2 - h;
+        }
+        handler.move(newX - x, newY - y);
     }
 
     async _drawItem(itemSvg, position, appereance) {
