@@ -27,6 +27,8 @@ export class Surface {
             this._$messageError.innerText = "Connection lost.\nReconnecting ...";
             this._$messageError.classList.remove("template");
         });
+
+        this.messageBus.addGameEventListiner('object_move', event => this.moveObject(event.itemId, event.position));
     }
 
     clean() {
@@ -57,6 +59,15 @@ export class Surface {
         this._$messageLoading.classList.add("template");
     }
 
+    moveObject(itemId, position) {
+        const objectGroup = this._byItemId[itemId];
+        if (objectGroup !== undefined) {
+            objectGroup.move(position.x, position.y);
+        } else {
+            utils.error('try to move unknown object', itemId);
+        }
+    }
+
     async _addGameObject(svg, object) {
         const objectGroup = svg.nested();
         await this._drawItem(objectGroup, object.currentPosition, object.currentAppereance);
@@ -65,23 +76,30 @@ export class Surface {
         if (object.isDraggable) {
             objectGroup.draggable();
             const dragzoneId = object.draggableZone ? object.draggableZone.itemId : 'root';
-            objectGroup.on('dragmove.namespace', (e) => this._dragObject(dragzoneId, e));
-
-            objectGroup.on('beforedrag.namespace', (e) => {
-               utils.debug("before drag", e);
-            });
-
-            objectGroup.on('dragstart.namespace', (e) => {
-               utils.debug("drag start", e);
-            });
-
-            objectGroup.on('dragend.namespace', (e) => {
-               utils.debug("drag end", e);
-            });
+            objectGroup.on('dragmove.namespace', (e) => this._dragObject(object, dragzoneId, e));
+            objectGroup.on('dragstart.namespace', (e) => this._dragStart(object, objectGroup, e));
+            objectGroup.on('dragend.namespace', (e) => this._dragEnd(object, objectGroup, e));
         }
     }
 
-    _dragObject(dragzoneId, e) {
+    _dragStart(object, objectGroup, e) {
+        this.messageBus.notify({
+            eventType: 'object_drag_start',
+            itemId: object.itemId,
+            rulesetObjectId: object.rulesetObjectId
+        });
+    }
+
+    _dragEnd(object, objectGroup, e) {
+        this.messageBus.notify({
+            eventType: 'object_drag_end',
+            itemId: object.itemId,
+            rulesetObjectId: object.rulesetObjectId,
+            position: {x: objectGroup.x(), y: objectGroup.y()}
+        });
+    }
+
+    _dragObject(object, dragzoneId, e) {
         const draggableZone = this._byItemId[dragzoneId];
         e.preventDefault();
         if (!draggableZone) {
@@ -116,6 +134,17 @@ export class Surface {
             newY = constraints.y2 - h;
         }
         handler.move(newX - x, newY - y);
+
+        const roundNewX = Math.round(newX);
+        const roundNewY = Math.round(newY);
+        if (roundNewX !== Math.round(x) || roundNewY !== Math.round(y)) {
+            this.messageBus.notify({
+                eventType: 'object_drag',
+                itemId: object.itemId,
+                rulesetObjectId: object.rulesetObjectId,
+                position: {x: roundNewX, y: roundNewY}
+            });
+        }
     }
 
     async _drawItem(itemSvg, position, appereance) {

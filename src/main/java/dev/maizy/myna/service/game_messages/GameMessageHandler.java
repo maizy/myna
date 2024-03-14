@@ -5,12 +5,15 @@ package dev.maizy.myna.service.game_messages;
  */
 
 import dev.maizy.myna.game_message.BroadcastMessage;
+import dev.maizy.myna.game_message.Event;
 import dev.maizy.myna.game_message.EventType;
 import dev.maizy.myna.game_message.PlayerMessage;
 import dev.maizy.myna.game_message.Request;
 import dev.maizy.myna.game_message.event.ImmutableGameState;
+import dev.maizy.myna.game_message.event.ImmutableObjectMove;
 import dev.maizy.myna.game_message.event.ImmutablePlayerState;
 import dev.maizy.myna.game_message.event.ImmutablePlayersState;
+import dev.maizy.myna.game_message.event.ObjectDrag;
 import dev.maizy.myna.game_message.response.ImmutableFullView;
 import dev.maizy.myna.game_state.GameState;
 import dev.maizy.myna.service.GameItemsService;
@@ -42,9 +45,11 @@ public class GameMessageHandler {
     gameStateService.subscribeToGameStateChange(this);
   }
 
-  public void onPlayerMessageReceived(PlayerMessage event, GameMessageBus bus) {
-    if (event.message() instanceof Request request) {
-      onRequestReceived(request, event.context(), bus);
+  public void onPlayerMessageReceived(PlayerMessage message, GameMessageBus bus) {
+    if (message.message() instanceof Request request) {
+      onRequestReceived(request, message.context(), bus);
+    } else if (message.message() instanceof Event event) {
+      onEventReceived(event, message.context(), bus);
     }
   }
 
@@ -89,6 +94,19 @@ public class GameMessageHandler {
 
       default ->
         log.warn("unsupported request type: {}", request.requestType());
+    }
+  }
+
+  protected void onEventReceived(Event event, PlayerWebsocketContext wsContext, GameMessageBus bus) {
+    if (event.eventType() == EventType.object_drag && event instanceof ObjectDrag objectDrag) {
+      final var moveEvent = ImmutableObjectMove.builder()
+          .gameId(wsContext.gameId())
+          .itemId(objectDrag.itemId())
+          .rulesetObjectId(objectDrag.rulesetObjectId())
+          .position(objectDrag.position())
+          .build();
+      // intermediate object position isn't saved, it's only broadcasted to other players
+      bus.broadcastMessageToAllPlayersExceptCurrent(moveEvent);
     }
   }
 

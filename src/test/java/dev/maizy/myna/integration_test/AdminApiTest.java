@@ -149,9 +149,9 @@ class AdminApiTest {
         .exchange()
         .expectStatus().isOk()
         .expectBody()
-          // 2 predefined rulesets & one added above
-          .jsonPath("$.total_elements").isEqualTo(3)
-          .jsonPath("$.content").value(hasSize(3));
+          // predefined ruleset & one added above
+          .jsonPath("$.total_elements").isEqualTo(2)
+          .jsonPath("$.content").value(hasSize(2));
   }
 
   @Test

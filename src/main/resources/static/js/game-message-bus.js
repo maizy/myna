@@ -111,6 +111,12 @@ export class GameMessageBus {
         this.send(payload);
     }
 
+    notify(payload) {
+        payload.gameId = this.gameId;
+        payload.kind = "event";
+        this.send(payload);
+    }
+
     addGameEventListiner(eventType, callback) {
         this._messageListeners.event[eventType] = this._messageListeners.event[eventType] || [];
         this._messageListeners.event[eventType].push(callback);
