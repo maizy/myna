@@ -22,5 +22,11 @@ public abstract class RectangleAppearance {
   }
 
   public abstract Optional<Color> backgroundColor();
+
+  /**
+   * png or jpeg
+   */
   public abstract Optional<String> backgroundImage();
+
+  public abstract Optional<String> backgroundSvg();
 }

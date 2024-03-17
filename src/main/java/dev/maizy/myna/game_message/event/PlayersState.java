@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import dev.maizy.myna.game_message.Event;
 import dev.maizy.myna.game_message.EventType;
-import dev.maizy.myna.ruleset.Player;
+import dev.maizy.myna.game_message.PlayerWithStatus;
 import java.util.List;
 import org.immutables.value.Value;
 
@@ -16,18 +16,6 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutablePlayersState.class)
 @JsonDeserialize(as = ImmutablePlayersState.class)
 public abstract class PlayersState implements Event {
-
-  public enum PlayerStatus { playing, absent }
-
-  @Value.Immutable
-  @JsonSerialize(as = ImmutablePlayerWithStatus.class)
-  @JsonDeserialize(as = ImmutablePlayerWithStatus.class)
-  public abstract static class PlayerWithStatus {
-    @Value.Parameter
-    public abstract Player player();
-    @Value.Parameter
-    public abstract PlayerStatus status();
-  }
 
   @Override
   public abstract String gameId();

@@ -1,7 +1,7 @@
-(function () {
-    window.Myna = window.Myna || {};
+"use strict";
 
-    function GameState(gameUriTemplate, currentGameState, messageBus) {
+export class GameState {
+    constructor(gameUriTemplate, currentGameState, messageBus) {
         this.gameUriTemplate = gameUriTemplate;
         this.messageBus = messageBus;
         this.currentGameState = currentGameState;
@@ -13,18 +13,25 @@
         };
     }
 
-    GameState.prototype.init = function () {
-        this.messageBus.addEventListiner('game_state_changed', this.gameStateChanged.bind(this));
-    };
+    init() {
+        this.messageBus.addGameEventListiner(
+            'game_state_changed',
+            (event) => this.gameStateChanged(event.newState)
+        );
+        this.messageBus.addEventListiner("connected", () => {
+            this.messageBus.request(
+                {requestType: "get_game_state"},
+                (message) => this.gameStateChanged(message.currentState)
+            );
+        });
+    }
 
-    GameState.prototype.gameStateChanged = function (event) {
-        if (event.newState !== this.currentGameState) {
-            const page = this._pagesByState[event.newState];
+    gameStateChanged(state) {
+        if (state !== this.currentGameState) {
+            const page = this._pagesByState[state];
             if (page !== undefined) {
                 document.location = this.gameUriTemplate.replace('PAGE', page);
             }
         }
-    };
-
-    window.Myna.GameState = GameState;
-})();
+    }
+}

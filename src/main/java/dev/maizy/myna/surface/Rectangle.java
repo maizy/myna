@@ -4,6 +4,7 @@ package dev.maizy.myna.surface;
  * See LICENSE.txt for details.
  */
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
@@ -26,7 +27,12 @@ public abstract class Rectangle {
     }
   }
 
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   public Size size() {
     return ImmutableSize.of(bottomRight().x() - topLeft().x(), bottomRight().y() - topLeft().y());
+  }
+
+  public static Rectangle fromTopLeftAndSize(Point topLeft, Size size) {
+    return ImmutableRectangle.of(topLeft, ImmutablePoint.of(topLeft.x() + size.width(), topLeft.y() + size.height()));
   }
 }

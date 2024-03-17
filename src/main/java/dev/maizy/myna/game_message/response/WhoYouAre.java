@@ -5,7 +5,6 @@ package dev.maizy.myna.game_message.response;
  * See LICENSE.txt for details.
  */
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import dev.maizy.myna.game_message.Response;
@@ -17,7 +16,6 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableWhoYouAre.class)
 @JsonDeserialize(as = ImmutableWhoYouAre.class)
-@JsonTypeName("who_you_are")
 public abstract class WhoYouAre implements Response {
 
   @Override
@@ -28,6 +26,7 @@ public abstract class WhoYouAre implements Response {
   @Override
   public abstract String gameId();
 
+  @Override
   public abstract Optional<String> oid();
 
   public abstract Optional<Player> player();

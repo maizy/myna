@@ -8,5 +8,9 @@ public enum EventType {
   player_connected,
   player_disconnected,
   players_state_changed,
-  game_state_changed
+  game_state_changed,
+  object_drag,
+  object_move,
+  object_locked,
+  object_unlocked,
 }

@@ -52,82 +52,85 @@
 
         <button class="btn btn-primary btn-lg mt-3" type="submit">Create game</button>
     </form>
-    <script th:inline="javascript">
-        (function() {
-            window.MynaCreateForm = {};
-            window.MynaCreateForm.playersInfo = /*[[${playersInfo}]]*/{};
 
-            const Manager = function (playersInfo) {
-                this.playersInfo = playersInfo;
-            };
+<script th:inline="javascript" type="module">
+"use strict";
+const playersInfo = /*[[${playersInfo}]]*/ {};
 
-            function getFirstElementByClassName() {
-                const context = (arguments.length === 2) ? arguments[0] : window.document;
-                const className = (arguments.length === 2) ? arguments[1] : arguments[0];
-                const elements = context.getElementsByClassName(className);
-                return (elements.length > 0) ? elements[0] : undefined;
-            }
-            Manager.prototype.init = function () {
-                this.$container = getFirstElementByClassName("player-template__container");
-                this.$template = getFirstElementByClassName(this.$container, "player-template");
+function getFirstElementByClassName() {
+    const context = (arguments.length === 2) ? arguments[0] : window.document;
+    const className = (arguments.length === 2) ? arguments[1] : arguments[0];
+    const elements = context.getElementsByClassName(className);
+    return (elements.length > 0) ? elements[0] : undefined;
+}
 
-                this.$form = getFirstElementByClassName("create-form");
-                this.$rulesetsInputs = Array.from(this.$form.getElementsByClassName("create-form__ruleset_id"));
+class Manager {
+    constructor(playersInfo) {
+        this.playersInfo = playersInfo;
+    }
 
-                this.$rulesetsInputs.forEach(value =>
-                    value.addEventListener("change", this.onRulesetChange.bind(this))
-                );
+    init() {
+        this.$container = getFirstElementByClassName("player-template__container");
+        this.$template = getFirstElementByClassName(this.$container, "player-template");
 
-                this.rebuildPlayers();
-            };
+        this.$form = getFirstElementByClassName("create-form");
+        this.$rulesetsInputs = Array.from(this.$form.getElementsByClassName("create-form__ruleset_id"));
 
-            Manager.prototype.onRulesetChange = function () {
-                this.rebuildPlayers();
-            };
+        this.$rulesetsInputs.forEach(value =>
+            value.addEventListener("change", this.onRulesetChange.bind(this))
+        );
 
-            Manager.prototype.getCurrentRulesetId = function () {
-                const checkedInput = this.$rulesetsInputs.find(e => e.checked);
-                if (checkedInput !== undefined) {
-                    return checkedInput.value;
+        this.rebuildPlayers();
+    }
+
+    onRulesetChange() {
+        this.rebuildPlayers();
+    }
+
+    getCurrentRulesetId() {
+        const checkedInput = this.$rulesetsInputs.find(e => e.checked);
+        if (checkedInput !== undefined) {
+            return checkedInput.value;
+        }
+        return undefined;
+    }
+
+    rebuildPlayers() {
+        const that = this;
+        Array.from(this.$container.getElementsByClassName("player-template__item"))
+            .forEach(element =>
+                element.remove()
+            );
+
+        const ruleset = this.getCurrentRulesetId();
+        if (ruleset !== undefined) {
+            const players = this.playersInfo[ruleset].players;
+            let firstPlayer = true;
+            players.forEach(player => {
+                const playerNode = that.$template.cloneNode(true);
+                playerNode.classList.remove("template");
+                playerNode.classList.add("player-template__item");
+                getFirstElementByClassName(playerNode, "player-template__role").innerText = player.roleName;
+
+                const playerName = getFirstElementByClassName(playerNode, "player-template__name");
+                playerName.name = `playerName[${player.id}]`;
+
+                const me = getFirstElementByClassName(playerNode, "player-template__me");
+                me.value = player.id;
+                if (firstPlayer) {
+                    me.checked = true;
+                    firstPlayer = false;
                 }
-                return undefined;
-            };
+                that.$container.append(playerNode);
+            });
+        }
+    }
+}
 
-            Manager.prototype.rebuildPlayers = function () {
-                const that = this;
-                Array.from(this.$container.getElementsByClassName("player-template__item"))
-                    .forEach(element =>
-                        element.remove()
-                    );
-
-                const ruleset = this.getCurrentRulesetId();
-                if (ruleset !== undefined) {
-                    const players = this.playersInfo[ruleset].players;
-                    let firstPlayer = true;
-                    players.forEach(player => {
-                        const playerNode = that.$template.cloneNode(true);
-                        playerNode.classList.remove("template");
-                        playerNode.classList.add("player-template__item");
-                        getFirstElementByClassName(playerNode, "player-template__role").innerText = player.roleName;
-
-                        const playerName = getFirstElementByClassName(playerNode, "player-template__name");
-                        playerName.name = `playerName[${player.id}]`;
-
-                        const me = getFirstElementByClassName(playerNode, "player-template__me");
-                        me.value = player.id;
-                        if (firstPlayer) {
-                            me.checked = true;
-                            firstPlayer = false;
-                        }
-                        that.$container.append(playerNode);
-                    });
-                }
-            };
-
-            window.MynaCreateForm.manager = new Manager(window.MynaCreateForm.playersInfo);
-            window.MynaCreateForm.manager.init();
-        })();
-    </script>
+window.MynaInstances = window.MynaInstances || {};
+window.MynaInstances.createFormManager = new Manager(playersInfo);
+window.MynaInstances.createFormManager.init();
+</script>
 </div>
 </body>
 </html>

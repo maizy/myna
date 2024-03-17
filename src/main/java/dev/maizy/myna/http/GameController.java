@@ -238,7 +238,7 @@ public class GameController {
     view.addObject("rulesetName", ruleset.name());
     view.addObject("gameState", game.getState());
 
-    final var gameUriTemplateBuilder = uriService.getBaseUriBuilder().pathSegment("game", "{gameId}", "PAGE");
+    final var gameUriTemplateBuilder = uriService.getBaseRelativeUriBuilder().pathSegment("game", "{gameId}", "PAGE");
     final Map<String, String> uriParams = new HashMap<>();
     uriParams.put("gameId", game.getId());
 

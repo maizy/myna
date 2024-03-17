@@ -9,6 +9,7 @@ import dev.maizy.myna.surface.ImmutablePoint;
 import dev.maizy.myna.surface.ImmutableRectangle;
 import dev.maizy.myna.surface.ImmutableRectangleAppearance;
 import dev.maizy.myna.surface.ImmutableSize;
+import dev.maizy.myna.surface.Point;
 
 public final class SampleRulesets {
 
@@ -213,35 +214,98 @@ public final class SampleRulesets {
   }
 
   public static Ruleset checkersRuleset() {
-    // TODO: position all checkers on the board
     final var black = ImmutableObjectState.builder()
         .id("black")
-        .appearance(ImmutableRectangleAppearance.builder().text("⚫️").build())
+        .appearance(
+            ImmutableRectangleAppearance.builder()
+                .backgroundSvg("/static/game_resources/checkers/checker_piece_black.svg")
+                .build()
+        )
         .build();
 
     final var white = ImmutableObjectState.builder()
         .id("white")
-        .appearance(ImmutableRectangleAppearance.builder().text("⚪️").build())
+        .appearance(
+            ImmutableRectangleAppearance.builder()
+                .backgroundSvg("/static/game_resources/checkers/checker_piece_white.svg")
+                .build()
+        )
+        .build();
+
+    final var blackCrown = ImmutableObjectState.builder()
+        .id("black_crown")
+        .appearance(
+            ImmutableRectangleAppearance.builder()
+                .backgroundSvg("/static/game_resources/checkers/checker_piece_black_crown.svg")
+                .build()
+        )
+        .build();
+
+    final var whiteCrown = ImmutableObjectState.builder()
+        .id("white_crown")
+        .appearance(
+            ImmutableRectangleAppearance.builder()
+                .backgroundSvg("/static/game_resources/checkers/checker_piece_white_crown.svg")
+                .build()
+        )
         .build();
 
     final var rootObjectsBuilder = ImmutableObjectsGroup.builder();
 
-    for (var i = 0; i < 12; i++) {
+    // main pieces
+    for (var line = 0; line < 3; line++) {
+      final var y = 100 + (100 * line) + 15;
+      final var xStartFrom = line % 2 == 0 ? 215 : 115;
+      for (var i = 0; i < 4; i++) {
+        final var index = line * 4 + i;
+        rootObjectsBuilder.addObject(
+            ImmutableGameObject.builder()
+                .id("b" + index)
+                .size(ImmutableSize.of(70, 70))
+                .relativePosition(ImmutablePoint.of(xStartFrom + 200 * i, y))
+                .addState(black)
+                .build()
+        );
+      }
+    }
+
+    for (var line = 0; line < 3; line++) {
+      final var y = 600 + (100 * line) + 15;
+      final var xStartFrom = line % 2 == 0 ? 115 : 215;
+      for (var i = 0; i < 4; i++) {
+        final var index = line * 4 + i;
+        rootObjectsBuilder.addObject(
+            ImmutableGameObject.builder()
+                .id("w" + index)
+                .size(ImmutableSize.of(70, 70))
+                .relativePosition(ImmutablePoint.of(xStartFrom + 200 * i, y))
+                .addState(white)
+                .build()
+        );
+      }
+    }
+
+    // crown pieces
+    for (var line = 0; line < 3; line++) {
+      final var y = 100 + (80 * line);
       rootObjectsBuilder.addObject(
           ImmutableGameObject.builder()
-              .id("b" + i)
-              .size(ImmutableSize.of(20, 20))
-              .addState(black)
+              .id("bc" + line)
+              .size(ImmutableSize.of(70, 70))
+              .relativePosition(ImmutablePoint.of(915, y))
+              .addState(blackCrown)
               .build()
       );
     }
 
-    for (var i = 0; i < 12; i++) {
+    for (var line = 0; line < 3; line++) {
+      final var y = 830 - (80 * line);
       rootObjectsBuilder.addObject(
           ImmutableGameObject.builder()
-              .id("w" + i)
-              .size(ImmutableSize.of(20, 20))
-              .addState(white)
+              .id("wc" + line)
+              .size(ImmutableSize.of(70, 70))
+              .relativePosition(ImmutablePoint.of(15, y))
+              .addState(whiteCrown)
               .build()
       );
     }
@@ -251,14 +315,12 @@ public final class SampleRulesets {
 
     final var gameZone = ImmutableZone.builder()
         .position(
-            ImmutableRectangle.of(
-                ImmutablePoint.of(0, 0),
-                ImmutablePoint.of(1024, 1024)
-            )
+            ImmutableRectangle.fromTopLeftAndSize(Point.zero(), ImmutableSize.of(1000, 1000))
         )
         .appearance(
             ImmutableRectangleAppearance.builder()
-                .backgroundColor(Colors.yellow.hex())
+                .backgroundColor(Colors.white.hex())
+                .backgroundSvg("/static/game_resources/simple_chess_board.svg")
                 .build()
         )
         .build();

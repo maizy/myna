@@ -8,6 +8,7 @@ package dev.maizy.myna.ruleset;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import dev.maizy.myna.ruleset.state_change.WithStates;
+import dev.maizy.myna.surface.Point;
 import dev.maizy.myna.surface.Size;
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +36,11 @@ public abstract class GameObject implements WithStates<ObjectState> {
   public abstract List<ObjectState> states();
 
   public abstract Size size();
+
+  @Value.Default
+  public Point relativePosition() {
+    return Point.zero();
+  }
 
   /**
    * only fixed state supported - <a href="https://github.com/maizy/myna/issues/14">iss #14</a>

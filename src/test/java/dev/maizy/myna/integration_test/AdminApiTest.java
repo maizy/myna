@@ -34,6 +34,8 @@ import org.testcontainers.junit.jupiter.Container;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AdminApiTest {
 
+  public static final String testRulesetId = "checkers_v1";
+
   @Autowired
   private ObjectMapper objectMapper;
 
@@ -147,9 +149,9 @@ class AdminApiTest {
         .exchange()
         .expectStatus().isOk()
         .expectBody()
-          // 2 predefined rulesets & one added above
-          .jsonPath("$.total_elements").isEqualTo(3)
-          .jsonPath("$.content").value(hasSize(3));
+          // predefined ruleset & one added above
+          .jsonPath("$.total_elements").isEqualTo(2)
+          .jsonPath("$.content").value(hasSize(2));
   }
 
   @Test
@@ -177,11 +179,11 @@ class AdminApiTest {
   @Order(4)
   void shouldNotDeleteRulesetWithPlayedGames(@Autowired WebTestClient webClient) {
 
-    gameStateService.createGame("checkers_v0", "owner", Collections.emptyMap(), Optional.empty());
+    gameStateService.createGame(testRulesetId, "owner", Collections.emptyMap(), Optional.empty());
 
     webClient
         .delete()
-          .uri("/admin/api/v1/ruleset/{id}", "checkers_v0")
+          .uri("/admin/api/v1/ruleset/{id}", testRulesetId)
           .header("Authorization", "Bearer admintoken1")
         .exchange()
         .expectStatus().isForbidden()

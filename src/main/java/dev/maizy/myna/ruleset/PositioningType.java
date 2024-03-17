@@ -7,4 +7,5 @@ package dev.maizy.myna.ruleset;
 
 public enum PositioningType {
   stack
+  // TODO: add "auto" for autopositioning objects inside container
 }

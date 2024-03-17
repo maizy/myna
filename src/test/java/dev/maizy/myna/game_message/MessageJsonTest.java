@@ -8,9 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.maizy.myna.configuration.JacksonConfiguration;
 import dev.maizy.myna.game_message.event.ImmutableGameState;
 import dev.maizy.myna.game_message.event.ImmutablePlayerState;
-import dev.maizy.myna.game_message.event.ImmutablePlayerWithStatus;
 import dev.maizy.myna.game_message.event.ImmutablePlayersState;
-import dev.maizy.myna.game_message.event.PlayersState;
 import dev.maizy.myna.game_message.request.ImmutableParameterlessRequest;
 import dev.maizy.myna.game_message.response.ImmutableWhoYouAre;
 import dev.maizy.myna.game_state.GameState;
@@ -66,10 +64,10 @@ class MessageJsonTest {
         ImmutablePlayersState.builder()
             .gameId("test")
             .addPlayer(ImmutablePlayerWithStatus.of(
-                ImmutablePlayer.builder().roleName("Player 1").id("p1").build(), PlayersState.PlayerStatus.playing
+                ImmutablePlayer.builder().roleName("Player 1").id("p1").build(), PlayerWithStatus.PlayerStatus.playing
             ))
             .addPlayer(ImmutablePlayerWithStatus.of(
-                ImmutablePlayer.of("p2"), PlayersState.PlayerStatus.absent
+                ImmutablePlayer.of("p2"), PlayerWithStatus.PlayerStatus.absent
             ))
             .build()
     );

@@ -5,6 +5,7 @@ package dev.maizy.myna.db.repository;
  */
 
 import dev.maizy.myna.db.entity.GameEntity;
+import dev.maizy.myna.game_state.GameState;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -17,4 +18,8 @@ public interface GameRepository extends CrudRepository<GameEntity, String> {
 
   @Query("SELECT game FROM GameEntity game LEFT JOIN FETCH game.ruleset WHERE game.id = ?1")
   Optional<GameEntity> findByIdAndFetchRuleset(String gameId);
+
+  @Query("SELECT game.state FROM GameEntity game WHERE game.id = ?1")
+  Optional<GameState> getStateById(String gameId);
+
 }

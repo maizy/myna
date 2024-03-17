@@ -111,6 +111,14 @@ public class UriService {
     return builder;
   }
 
+  public UriComponentsBuilder getBaseRelativeUriBuilder() {
+    final var builder = UriComponentsBuilder.newInstance();
+    if (!getContextPath().equals("")) {
+      return builder.path(getContextPath());
+    }
+    return builder;
+  }
+
   public String getBaseUri() {
     return getBaseUriBuilder().toUriString();
   }
