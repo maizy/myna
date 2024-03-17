@@ -11,6 +11,7 @@ export class Surface {
         this._$messageError = null;
 
         this._byItemId = {};
+        this._lockedObjects = {};
     }
 
     init() {
@@ -29,6 +30,8 @@ export class Surface {
         });
 
         this.messageBus.addGameEventListiner('object_move', event => this.moveObject(event.itemId, event.position));
+        this.messageBus.addGameEventListiner('object_locked', event => this.lockObject(event.itemId));
+        this.messageBus.addGameEventListiner('object_unlocked', event => this.unlockObject(event.itemId));
     }
 
     clean() {
@@ -68,6 +71,14 @@ export class Surface {
         }
     }
 
+    lockObject(itemId) {
+        this._lockedObjects[itemId] = true;
+    }
+
+    unlockObject(itemId) {
+        delete this._lockedObjects[itemId];
+    }
+
     async _addGameObject(svg, object) {
         const objectGroup = svg.nested();
         await this._drawItem(objectGroup, object.currentPosition, object.currentAppereance);
@@ -77,26 +88,46 @@ export class Surface {
             objectGroup.draggable();
             const dragzoneId = object.draggableZone ? object.draggableZone.itemId : 'root';
             objectGroup.on('dragmove.namespace', (e) => this._dragObject(object, dragzoneId, e));
-            objectGroup.on('dragstart.namespace', (e) => this._dragStart(object, objectGroup, e));
-            objectGroup.on('dragend.namespace', (e) => this._dragEnd(object, objectGroup, e));
+            objectGroup.on('beforedrag.namespace', (e) => this._dragStart(object, dragzoneId, objectGroup, e));
+            objectGroup.on('dragend.namespace', (e) => this._dragEnd(object, dragzoneId, objectGroup, e));
         }
     }
 
-    _dragStart(object, objectGroup, e) {
-        this.messageBus.notify({
-            eventType: 'object_drag_start',
-            itemId: object.itemId,
-            rulesetObjectId: object.rulesetObjectId
-        });
+    _dragStart(object, dragzoneId, objectGroup, e) {
+        if (this._lockedObjects[object.itemId]) {
+            e.preventDefault();
+            return;
+        }
+        this.messageBus.request(
+            {
+                requestType: 'object_drag_start',
+                itemId: object.itemId,
+                rulesetObjectId: object.rulesetObjectId,
+                dragZoneItemId: dragzoneId
+            },
+            (response) => {
+                if (response.responseType === 'error') {
+                    e.preventDefault()
+                }
+            }
+        );
     }
 
-    _dragEnd(object, objectGroup, e) {
-        this.messageBus.notify({
-            eventType: 'object_drag_end',
-            itemId: object.itemId,
-            rulesetObjectId: object.rulesetObjectId,
-            position: {x: objectGroup.x(), y: objectGroup.y()}
-        });
+    _dragEnd(object, dragzoneId, objectGroup, e) {
+        this.messageBus.request(
+            {
+                requestType: 'object_drag_end',
+                itemId: object.itemId,
+                rulesetObjectId: object.rulesetObjectId,
+                dragZoneItemId: dragzoneId,
+                position: {x: objectGroup.x(), y: objectGroup.y()}
+            },
+            (response) => {
+                if (response.responseType === 'error') {
+                    utils.error("drag end error", response);
+                }
+            }
+        );
     }
 
     _dragObject(object, dragzoneId, e) {

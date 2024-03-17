@@ -8,5 +8,7 @@ public enum ResponseType {
   full_view,
   who_you_are,
   game_state,
-  players_state
+  players_state,
+  error,
+  ok,
 }

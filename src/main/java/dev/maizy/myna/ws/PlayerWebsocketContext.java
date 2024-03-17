@@ -12,4 +12,10 @@ public record PlayerWebsocketContext(
     long wsId, String gameId,
     Ruleset ruleset,
     String uid,
-    Optional<Player> rulesetPlayer) { }
+    Optional<Player> rulesetPlayer) {
+
+  public Optional<String> rulesetPlayerId() {
+    return rulesetPlayer.map(Player::id);
+  }
+
+}

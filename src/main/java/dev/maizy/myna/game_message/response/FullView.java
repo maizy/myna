@@ -5,7 +5,6 @@ package dev.maizy.myna.game_message.response;
  * See LICENSE.txt for details.
  */
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import dev.maizy.myna.game_message.Response;
@@ -17,7 +16,6 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableFullView.class)
 @JsonDeserialize(as = ImmutableFullView.class)
-@JsonTypeName("full_view")
 public abstract class FullView implements Response {
 
   @Override

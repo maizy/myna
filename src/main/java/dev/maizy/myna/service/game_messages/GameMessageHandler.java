@@ -10,17 +10,27 @@ import dev.maizy.myna.game_message.EventType;
 import dev.maizy.myna.game_message.PlayerMessage;
 import dev.maizy.myna.game_message.Request;
 import dev.maizy.myna.game_message.event.ImmutableGameState;
+import dev.maizy.myna.game_message.event.ImmutableObjectLocked;
 import dev.maizy.myna.game_message.event.ImmutableObjectMove;
+import dev.maizy.myna.game_message.event.ImmutableObjectUnlocked;
 import dev.maizy.myna.game_message.event.ImmutablePlayerState;
 import dev.maizy.myna.game_message.event.ImmutablePlayersState;
 import dev.maizy.myna.game_message.event.ObjectDrag;
+import dev.maizy.myna.game_message.request.ObjectDragEnd;
+import dev.maizy.myna.game_message.request.ObjectDragStart;
+import dev.maizy.myna.game_message.response.ImmutableError;
 import dev.maizy.myna.game_message.response.ImmutableFullView;
+import dev.maizy.myna.game_message.response.ImmutableOk;
+import dev.maizy.myna.game_model.ImmutableGameObject;
 import dev.maizy.myna.game_state.GameState;
 import dev.maizy.myna.service.GameItemsService;
+import dev.maizy.myna.service.GameItemsServiceErrors;
 import dev.maizy.myna.service.GameStateService;
 import dev.maizy.myna.service.GameStateServiceErrors;
 import dev.maizy.myna.service.PlayerStateService;
+import dev.maizy.myna.surface.Rectangle;
 import dev.maizy.myna.ws.PlayerWebsocketContext;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -90,6 +100,80 @@ public class GameMessageHandler {
             .players(playersStatus)
             .build();
         bus.responseWithMessage(response);
+      }
+
+      case object_drag_start -> {
+        if (request instanceof ObjectDragStart objectDragStart) {
+          gameItemsService.loadGameObject(wsContext.gameId(), objectDragStart.itemId()).ifPresent(object -> {
+            try {
+              final var lockedObject = gameItemsService.tryLockObject(
+                  wsContext.gameId(), object, wsContext.wsId(), wsContext.rulesetPlayerId().orElse(null)
+              );
+              gameItemsService.saveItem(wsContext.gameId(), lockedObject);
+
+              bus.responseWithMessage(ImmutableOk.builder()
+                  .gameId(wsContext.gameId())
+                  .oid(request.oid())
+                  .build()
+              );
+
+              bus.broadcastMessageToAllPlayersExceptCurrent(
+                  ImmutableObjectLocked.builder()
+                      .gameId(wsContext.gameId())
+                      .itemId(object.itemId())
+                      .rulesetObjectId(object.rulesetObjectId())
+                      .build()
+              );
+
+            } catch (GameItemsServiceErrors.Forbidden e) {
+              bus.responseWithMessage(ImmutableError.builder()
+                  .gameId(wsContext.gameId())
+                  .oid(request.oid())
+                  .message("Forbidden: " + e.getMessage())
+                  .build()
+              );
+            }
+          });
+        }
+      }
+
+      case object_drag_end -> {
+        if (request instanceof ObjectDragEnd objectDragEnd) {
+          gameItemsService.loadGameObject(wsContext.gameId(), objectDragEnd.itemId()).ifPresent(object -> {
+            try {
+              final var accessableObject = gameItemsService.tryLockObject(
+                  wsContext.gameId(), object, wsContext.wsId(), wsContext.rulesetPlayerId().orElse(null)
+              );
+              final var updatedPosition = Rectangle.fromTopLeftAndSize(
+                  objectDragEnd.position(), accessableObject.currentPosition().size()
+              );
+              final var updatedObject = ImmutableGameObject.copyOf(accessableObject)
+                  .withItemLock(Optional.empty())
+                  .withCurrentPosition(updatedPosition);
+              gameItemsService.saveItem(wsContext.gameId(), updatedObject);
+
+              bus.responseWithMessage(ImmutableOk.builder()
+                  .gameId(wsContext.gameId())
+                  .oid(request.oid())
+                  .build()
+              );
+              bus.broadcastMessageToAllPlayersExceptCurrent(
+                  ImmutableObjectUnlocked.builder()
+                      .gameId(wsContext.gameId())
+                      .itemId(object.itemId())
+                      .rulesetObjectId(object.rulesetObjectId())
+                      .build()
+              );
+            } catch (GameItemsServiceErrors.Forbidden e) {
+              bus.responseWithMessage(ImmutableError.builder()
+                  .gameId(wsContext.gameId())
+                  .oid(request.oid())
+                  .message("Forbidden: " + e.getMessage())
+                  .build()
+              );
+            }
+          });
+        }
       }
 
       default ->

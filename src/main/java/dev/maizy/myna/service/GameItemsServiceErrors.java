@@ -18,4 +18,14 @@ public class GameItemsServiceErrors {
       this.gameId = gameId;
     }
   }
+
+  public static class Forbidden extends GameItemsServiceException {
+    public Forbidden(String gameId, String message) {
+      super(gameId, message);
+    }
+
+    public Forbidden(String gameId, String message, Throwable cause) {
+      super(gameId, message, cause);
+    }
+  }
 }

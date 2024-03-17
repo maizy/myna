@@ -36,10 +36,11 @@ public abstract class GameObject implements Item {
     return false;
   }
 
-  @Value.Default
   public Optional<Ref> draggableZone() {
     return isDraggable() ? Optional.of(container()) : Optional.empty();
   }
+
+  public abstract Optional<ItemLock> itemLock();
 
   @Value.Check
   protected void check() {

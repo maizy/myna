@@ -7,6 +7,8 @@ package dev.maizy.myna.game_message;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import dev.maizy.myna.game_message.request.ImmutableObjectDragEnd;
+import dev.maizy.myna.game_message.request.ImmutableObjectDragStart;
 import dev.maizy.myna.game_message.request.ImmutableParameterlessRequest;
 import java.util.Optional;
 
@@ -21,6 +23,8 @@ import java.util.Optional;
         value = ImmutableParameterlessRequest.class,
         names = {"who_am_i", "get_full_view", "get_game_state", "get_players_state"}
     ),
+    @JsonSubTypes.Type(value = ImmutableObjectDragStart.class, name = "object_drag_start"),
+    @JsonSubTypes.Type(value = ImmutableObjectDragEnd.class, name = "object_drag_end"),
 })
 public interface Request extends Message {
 

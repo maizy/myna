@@ -5,7 +5,6 @@ package dev.maizy.myna.game_message.response;
  * See LICENSE.txt for details.
  */
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import dev.maizy.myna.game_message.PlayerWithStatus;
@@ -18,7 +17,6 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutablePlayersState.class)
 @JsonDeserialize(as = ImmutablePlayersState.class)
-@JsonTypeName("players_state")
 public abstract class PlayersState implements Response {
 
   @Override

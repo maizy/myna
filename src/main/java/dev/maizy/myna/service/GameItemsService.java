@@ -10,6 +10,7 @@ import dev.maizy.myna.game_model.GameModel;
 import dev.maizy.myna.game_model.GameObject;
 import dev.maizy.myna.game_model.ImmutableGameModel;
 import dev.maizy.myna.game_model.ImmutableGameObject;
+import dev.maizy.myna.game_model.ImmutableItemLock;
 import dev.maizy.myna.game_model.ImmutableZone;
 import dev.maizy.myna.game_model.Item;
 import dev.maizy.myna.game_model.Ref;
@@ -20,11 +21,13 @@ import dev.maizy.myna.surface.Rectangle;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -178,5 +181,24 @@ public class GameItemsService {
         .toArray(GameObject[]::new);
     gameModelBuiler.addObjects(gameObjects);
     return Optional.of(gameModelBuiler.build());
+  }
+
+  public GameObject tryLockObject(String gameId, GameObject object, long wsId, @Nullable String rulesetPlayerId) {
+    if (object.itemLock().isEmpty()) {
+      return ImmutableGameObject.copyOf(object)
+          .withItemLock(ImmutableItemLock.of(wsId, rulesetPlayerId));
+    } else {
+      final var currentLock = object.itemLock().get();
+      final var theSamePlayerId = Objects.equals(currentLock.rulesetPlayerId(), rulesetPlayerId);
+      final var lockWithoutPlayer = currentLock.rulesetPlayerId() == null;
+      if (theSamePlayerId || lockWithoutPlayer) {
+        if (wsId != currentLock.wsId()) {
+          return ImmutableGameObject.copyOf(object)
+              .withItemLock(ImmutableItemLock.copyOf(currentLock).withWsId(wsId));
+        }
+        return object;
+      }
+      throw new GameItemsServiceErrors.Forbidden(gameId, "Item locked by another player");
+    }
   }
 }

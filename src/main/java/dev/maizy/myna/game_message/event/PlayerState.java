@@ -27,7 +27,7 @@ public abstract class PlayerState implements Event {
   @Value.Check
   protected void check() {
     if (eventType() != EventType.player_connected && eventType() != EventType.player_disconnected) {
-      throw new IllegalArgumentException("only player_* event allowed");
+      throw new IllegalArgumentException("only player_* events are allowed");
     }
   }
 }
