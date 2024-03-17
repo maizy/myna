@@ -1,7 +1,9 @@
 "use strict";
 
+const debugEnabled = window.location.hash.indexOf('debug') !== -1;
+
 export function debug() {
-    if (window.console !== undefined && window.console.debug !== undefined) {
+    if (debugEnabled && window.console !== undefined && window.console.debug !== undefined) {
         window.console.debug.apply(null, arguments);
     }
 }
