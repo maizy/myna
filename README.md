@@ -11,7 +11,21 @@ Virtual board games.
   </tr>
 </table>
 
-## _TBA_
+
+## What is it?
+
+`myna` is a web app for virtual board games. The main idea is to provide a virtual table for any board game. 
+It doesn't force players to follow the rules of a game. Instead, like in real life, there are different game 
+objects to interact with.
+
+Currently only simple movable game objects are supported, but there are plans to support more:
+
+| Object type | New ability |
+| ----------- | ----------- |
+| Object with multiple states that change in a particular or random order | Dice, power-ups, active player indicator |
+| Object stacks, pick game objects from the stack in a particular or random order | Card deck, object placement games |
+| Additional game zones hidden from other players | Virtual hand for card games |
+
 
 ## Developer environment
 
