@@ -26,6 +26,12 @@ Currently only simple movable game objects are supported, but there are plans to
 | Object stacks, pick game objects from the stack in a particular or random order | Card deck, object placement games |
 | Additional game zones hidden from other players | Virtual hand for card games |
 
+## Demo
+
+
+https://github.com/maizy/myna/assets/789623/97952daa-3406-48a6-af20-c89ebdedb17b
+
+
 ## Technical details
 
 I made it because I needed to revise Spring ecosystem and do something useful at the same time.
