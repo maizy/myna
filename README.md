@@ -26,6 +26,17 @@ Currently only simple movable game objects are supported, but there are plans to
 | Object stacks, pick game objects from the stack in a particular or random order | Card deck, object placement games |
 | Additional game zones hidden from other players | Virtual hand for card games |
 
+## Technical details
+
+I made it because I needed to revise Spring ecosystem and do something useful at the same time.
+
+So, the key points of this project are
+
+* Based on Spring components: Spring Boot 2.x, Spring Web MVC, Spring Security, Spring Data
+* Service is stateless, it's ready to run in a distributed manner
+* All state stored in Redis and PostgresSQL
+* Redis pubsub is used for the internal message bus, and all messages pass through this bus
+* Websocket is used for communication between backend and frontend parts
 
 ## Developer environment
 
