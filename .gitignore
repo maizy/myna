@@ -24,3 +24,6 @@ build/
 dev/data/postgres/data
 dev/data/psql
 dev/data/redis
+
+deploy/data
+deploy/myna.env

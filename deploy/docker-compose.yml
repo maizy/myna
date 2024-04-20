@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+
+  myna:
+    image: ghcr.io/maizy/myna:0.0.1-preview1
+    ports:
+      # for using with reverse proxy
+      - "127.0.0.1:12813:12813"
+      # for using directly
+      #- "12813:12813"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - 'SPRING_DATASOURCE_USERNAME=myna'
+      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/myna'
+      - 'SPRING_REDIS_HOST=redis'
+      - 'SPRING_REDIS_PORT=6379'
+    env_file:
+      - ./myna.env
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16.1-alpine
+    environment:
+      POSTGRES_USER: myna
+      POSTGRES_DB: myna
+      TZ: UTC
+    env_file:
+      - ./myna.env
+    volumes:
+      # path for postgres data
+      - ./data/postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "myna"]
+      start_period: 30s
+      interval: 10s
+      timeout: 2s
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.2.3-alpine
+    env_file:
+      - ./myna.env
+    volumes:
+      # path for redis data
+      - ./data/redis:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a $$SPRING_REDIS_PASSWORD ping | grep PONG"]
+      start_period: 5s
+      interval: 10s
+      timeout: 1s
+    command: sh -c 'redis-server --save 5 1 --loglevel warning --requirepass "$$SPRING_REDIS_PASSWORD"'
+    restart: unless-stopped
