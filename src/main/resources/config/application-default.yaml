@@ -21,6 +21,15 @@ server:
       cookie:
         name: myna_sid
         max-age: 28d
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      livenessState:
+        enabled: true
+      readinessState:
+        enabled: true
 myna:
   admin-api:
     # preconfigured API token for admin API
