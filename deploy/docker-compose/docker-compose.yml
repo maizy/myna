@@ -2,7 +2,7 @@ version: "3.8"
 services:
 
   myna:
-    image: ghcr.io/maizy/myna:0.0.1-preview1
+    image: ghcr.io/maizy/myna:0.0.1-preview2
     ports:
       # for using with reverse proxy
       - "127.0.0.1:12813:12813"

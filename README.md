@@ -31,12 +31,23 @@ Currently only simple movable game objects are supported, but there are plans to
 
 https://github.com/maizy/myna/assets/789623/97952daa-3406-48a6-af20-c89ebdedb17b
 
-## Run
+## Run with docker-compose
 
 * setup docker-compose.yml based on [deploy/docker-compose.yml](deploy/docker-compose.yml)
 * setup myna.env based on [deploy/myna.env.example](deploy/myna.env.example)
 * run `docker compose up -d`
 * if you need a reverse proxy, see the sample nginx config in [deploy/myna-nginx.conf](deploy/myna-nginx.conf)
+
+## Run with k8s
+
+* setup `deploy/helm/myna/values.yaml`
+* deploy
+
+```
+cd deploy/helm
+helm dependency build myna
+helm install <NAME> myna
+```
 
 ## Technical details
 

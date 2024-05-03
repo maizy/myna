@@ -25,5 +25,7 @@ dev/data/postgres/data
 dev/data/psql
 dev/data/redis
 
-deploy/data
-deploy/myna.env
+deploy/docker-compose/data
+deploy/docker-compose/myna.env
+
+deploy/helm/myna/charts/*
