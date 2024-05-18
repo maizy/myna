@@ -33,10 +33,10 @@ https://github.com/maizy/myna/assets/789623/97952daa-3406-48a6-af20-c89ebdedb17b
 
 ## Run with docker-compose
 
-* setup docker-compose.yml based on [deploy/docker-compose.yml](deploy/docker-compose.yml)
-* setup myna.env based on [deploy/myna.env.example](deploy/myna.env.example)
+* setup docker-compose.yml based on [deploy/docker-compose/docker-compose.yml](deploy/docker-compose/docker-compose.yml)
+* setup myna.env based on [deploy/docker-compose/myna.env.example](deploy/docker-compose/myna.env.example)
 * run `docker compose up -d`
-* if you need a reverse proxy, see the sample nginx config in [deploy/myna-nginx.conf](deploy/myna-nginx.conf)
+* if you need a reverse proxy, see the sample nginx config in [deploy/docker-compose/myna-nginx.conf](deploy/docker-compose/myna-nginx.conf)
 
 ## Run with k8s
 
