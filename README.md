@@ -67,9 +67,9 @@ For IntelliJ Idea:
 * don't forget to enable annotation processing
 
 Requirements:
-* JDK 17
+* JDK 21
 * docker
-* docker compose as a plugin or docker-compose utility
+* docker compose
 
 Start DB:
 
