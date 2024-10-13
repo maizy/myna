@@ -23,7 +23,7 @@ import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorato
 @Service
 public class GameMessagesSubscriptionService {
 
-  public record PlayerWsSession(long id, String rolesetPlayerId, ConcurrentWebSocketSessionDecorator wsSession) {
+  public record PlayerWsSession(long id, String rulesetPlayerId, ConcurrentWebSocketSessionDecorator wsSession) {
   }
 
   private static final Logger log = LoggerFactory.getLogger(GameMessagesSubscriptionService.class);
@@ -53,30 +53,30 @@ public class GameMessagesSubscriptionService {
     gamesBroadcastMessagesListeners.computeIfAbsent(
         gameId,
         newGameId -> {
-          final var gameMessagesListiner = gameBroadcastMessagesListenerFactory.getObject(newGameId);
+          final var gameMessagesListener = gameBroadcastMessagesListenerFactory.getObject(newGameId);
           redisListenerContainer.addMessageListener(
-              gameMessagesListiner, GameTopic.forGame(newGameId)
+              gameMessagesListener, GameTopic.forGame(newGameId)
           );
           log.debug("subscribe to game messages for gameId={}", newGameId);
-          return gameMessagesListiner;
+          return gameMessagesListener;
         }
     );
   }
 
   private void unsubscribeFromGameMessages(String gameId) {
-    gamesBroadcastMessagesListeners.computeIfPresent(gameId, (removedGameId, listiner) -> {
-      redisListenerContainer.removeMessageListener(listiner);
+    gamesBroadcastMessagesListeners.computeIfPresent(gameId, (removedGameId, listener) -> {
+      redisListenerContainer.removeMessageListener(listener);
       log.debug("unsubscribe from game messages for gameId={}", removedGameId);
       return null;
     });
   }
 
-  public long addPlayerWsSession(String gameId, String rolesetPlayerId, WebSocketSession wsSession) {
+  public long addPlayerWsSession(String gameId, String rulesetPlayerId, WebSocketSession wsSession) {
     final var wsId = random.nextLong();
     final var wsSessionDecorator = new ConcurrentWebSocketSessionDecorator(
         wsSession, 1000, 512, ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP
     );
-    final var playerWsSession = new PlayerWsSession(wsId, rolesetPlayerId, wsSessionDecorator);
+    final var playerWsSession = new PlayerWsSession(wsId, rulesetPlayerId, wsSessionDecorator);
     playersWsSessions.compute(gameId, (newGameId, sessions) -> {
       final var nonEmptySessions = (sessions == null) ? new ConcurrentHashMap<Long, PlayerWsSession>() : sessions;
       nonEmptySessions.put(wsId, playerWsSession);
@@ -149,7 +149,7 @@ public class GameMessagesSubscriptionService {
       } catch (IOException e) {
         log.warn(
             "Unable to deliver broadcast message to player: gameId={}, playerId={}",
-            gameId, player.rolesetPlayerId()
+            gameId, player.rulesetPlayerId()
         );
       }
     }

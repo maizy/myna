@@ -5,10 +5,11 @@ spring:
     password: devtest
   thymeleaf:
     cache: false
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    password: devtest
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: devtest
 logging:
   level:
     org.hibernate.SQL: DEBUG

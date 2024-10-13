@@ -4,7 +4,7 @@ package dev.maizy.myna.auth;
  * See LICENSE.txt for details.
  */
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
 public class AuthentificateFromUidFilter extends AbstractPreAuthenticatedProcessingFilter {

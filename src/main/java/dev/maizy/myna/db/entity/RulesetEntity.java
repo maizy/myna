@@ -5,10 +5,11 @@ package dev.maizy.myna.db.entity;
  */
 
 import dev.maizy.myna.ruleset.Ruleset;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import org.hibernate.annotations.Type;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "rulesets")
@@ -17,7 +18,7 @@ public class RulesetEntity {
   @Id
   private String id;
 
-  @Type(type = "jsonb")
+  @JdbcTypeCode(SqlTypes.JSON)
   private Ruleset ruleset;
 
   public String getId() {

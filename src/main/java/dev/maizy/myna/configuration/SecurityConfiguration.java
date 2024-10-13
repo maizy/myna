@@ -4,26 +4,15 @@ package dev.maizy.myna.configuration;
  * See LICENSE.txt for details.
  */
 
-import dev.maizy.myna.auth.AuthentificateByUidAuthenticationManager;
-import dev.maizy.myna.auth.AuthentificateFromUidFilter;
-import dev.maizy.myna.auth.AutoGenerateUidFilter;
-import dev.maizy.myna.auth.PreconfiguratedTokensFilter;
-import dev.maizy.myna.dto.api.AdminApiVersion;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-  private final AuthenticationManager adminAuthManager;
+  // FIXME
+  /*private final AuthenticationManager adminAuthManager;
 
   public SecurityConfiguration(@Qualifier("admin_auth_manager") AuthenticationManager adminAuthManager) {
     this.adminAuthManager = adminAuthManager;
@@ -87,5 +76,5 @@ public class SecurityConfiguration {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
         .and()
         .build();
-  }
+  }*/
 }

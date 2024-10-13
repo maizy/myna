@@ -1,7 +1,7 @@
 plugins {
   id 'java'
-  id 'org.springframework.boot' version '2.7.17'
-  id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+  id 'org.springframework.boot' version '3.3.4'
+  id 'io.spring.dependency-management' version '1.1.6'
   id 'checkstyle'
 }
 
@@ -9,7 +9,9 @@ group = 'dev.maizy'
 version = '0.0.1-SNAPSHOT'
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_21
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
 }
 
 configurations {
@@ -24,7 +26,7 @@ repositories {
 
 ext {
   set('testcontainersVersion', '1.19.4')
-  set('immutablesVersion', '2.7.3')
+  set('immutablesVersion', '2.10.1')
 }
 
 dependencies {
@@ -48,7 +50,7 @@ dependencies {
 
   implementation 'org.liquibase:liquibase-core'
   implementation 'org.postgresql:postgresql'
-  implementation 'io.hypersistence:hypersistence-utils-hibernate-55:3.6.1'
+  implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.8.3'
   implementation 'dev.maizy:gibberish:1.0.0'
 
   runtimeOnly 'io.micrometer:micrometer-registry-prometheus'

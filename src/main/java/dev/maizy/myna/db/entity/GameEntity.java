@@ -5,23 +5,22 @@ package dev.maizy.myna.db.entity;
  */
 
 import dev.maizy.myna.game_state.GameState;
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.ZonedDateTime;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
 @Entity
 @Table(name = "games")
-@TypeDef(name = "game_state_enum", typeClass = PostgreSQLEnumType.class)
 public class GameEntity {
 
   @Id
@@ -35,7 +34,7 @@ public class GameEntity {
   private String rulesetId;
 
   @Enumerated(EnumType.STRING)
-  @Type(type = "game_state_enum")
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   private GameState state;
 
   private ZonedDateTime createdAt;
