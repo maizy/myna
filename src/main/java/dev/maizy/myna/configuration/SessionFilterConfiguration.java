@@ -21,7 +21,7 @@ public class SessionFilterConfiguration extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
                                   FilterChain filterChain) throws ServletException, IOException {
     // disable session filter to prevent checking session in the storage when the session cookie is provided
-    // seems like it's only available workarond, see https://github.com/spring-projects/spring-session/issues/244
+    // seems like it's only available workaround, see https://github.com/spring-projects/spring-session/issues/244
     // there is no way to configure springSessionRepositoryFilter urls matcher
     if (!UrisWithSession.isUriWithSession(httpRequest.getRequestURI())) {
       httpRequest.setAttribute("org.springframework.session.web.http.SessionRepositoryFilter.FILTERED", Boolean.TRUE);

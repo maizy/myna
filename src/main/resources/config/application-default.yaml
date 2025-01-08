@@ -1,8 +1,6 @@
 spring:
   liquibase:
     change-log: 'classpath:/db/changelog/changelog.sql'
-  session:
-    store-type: redis
   jpa:
     open-in-view: false
   data:

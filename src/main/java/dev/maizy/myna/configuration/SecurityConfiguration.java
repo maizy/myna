@@ -1,18 +1,30 @@
 package dev.maizy.myna.configuration;
 /*
- * Copyright (c) Nikita Kovalev, maizy.dev, 2023
+ * Copyright (c) Nikita Kovalev, maizy.dev, 2023-2025
  * See LICENSE.txt for details.
  */
 
+import dev.maizy.myna.auth.AuthenticateFromUidFilter;
+import dev.maizy.myna.auth.AuthentificateByUidAuthenticationManager;
+import dev.maizy.myna.auth.AutoGenerateUidFilter;
+import dev.maizy.myna.auth.PreconfiguredTokensFilter;
+import dev.maizy.myna.dto.api.AdminApiVersion;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.NullSecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-  // FIXME
-  /*private final AuthenticationManager adminAuthManager;
+  private final AuthenticationManager adminAuthManager;
 
   public SecurityConfiguration(@Qualifier("admin_auth_manager") AuthenticationManager adminAuthManager) {
     this.adminAuthManager = adminAuthManager;
@@ -21,27 +33,28 @@ public class SecurityConfiguration {
   @Bean
   @Order(1)
   public SecurityFilterChain adminApiFilterChain(HttpSecurity http) throws Exception {
-    final var adminApiAuthFilter = new PreconfiguratedTokensFilter();
+    final var adminApiAuthFilter = new PreconfiguredTokensFilter();
     adminApiAuthFilter.setAuthenticationManager(adminAuthManager);
+    adminApiAuthFilter.setSecurityContextRepository(new NullSecurityContextRepository());
 
-    http.mvcMatcher(AdminApiVersion.prefix + "/**")
-        .csrf().disable()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
+    return http
+        .securityMatcher(AdminApiVersion.prefix + "/**")
+        .csrf(csrf -> csrf.disable())
+        .formLogin(form -> form.disable())
+        .logout(logout -> logout.disable())
+        .httpBasic(basic -> basic.disable())
+        .requestCache(cache -> cache.disable())
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.NEVER))
         .addFilter(adminApiAuthFilter)
-        .authorizeRequests()
-        .anyRequest().authenticated()
-        .and().anonymous().disable();
-
-    return http.build();
+        .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+        .anonymous(anonymous -> anonymous.disable())
+        .build();
   }
 
   @Bean
   @Order(2)
   public SecurityFilterChain withSessionFilterChain(HttpSecurity http) throws Exception {
-    final var httpSecurity = http.requestMatchers()
-        .mvcMatchers(UrisWithSession.mvcRulesWithCsrfProtection)
-        .and();
+    final var httpSecurity = http.securityMatcher(UrisWithSession.mvcRulesWithCsrfProtection);
     configureHttpSecurityWithSession(httpSecurity);
     return http.build();
   }
@@ -49,32 +62,37 @@ public class SecurityConfiguration {
   @Bean
   @Order(3)
   public SecurityFilterChain withSessionFilterChainWithoutCsrf(HttpSecurity http) throws Exception {
-
-    final var httpSecurity = http.requestMatchers()
-        .mvcMatchers(UrisWithSession.mvcRulesWithoutCsrfProtection)
-        .and().csrf().disable();
+    final var httpSecurity = http
+        .securityMatcher(UrisWithSession.mvcRulesWithoutCsrfProtection)
+        .csrf(csrf -> csrf.disable());
     configureHttpSecurityWithSession(httpSecurity);
     return http.build();
   }
 
   private void configureHttpSecurityWithSession(HttpSecurity httpSecurity) throws Exception {
-    final var gameAuthFilter = new AuthentificateFromUidFilter();
+    final var gameAuthFilter = new AuthenticateFromUidFilter();
     gameAuthFilter.setAuthenticationManager(new AuthentificateByUidAuthenticationManager());
+    gameAuthFilter.setSecurityContextRepository(new NullSecurityContextRepository());
     httpSecurity
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and().sessionManagement().sessionFixation().none()
-        .and()
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.NEVER))
+        .formLogin(form -> form.disable())
+        .logout(logout -> logout.disable())
+        .httpBasic(basic -> basic.disable())
+        .requestCache(cache -> cache.disable())
         .addFilter(gameAuthFilter)
-        .addFilterBefore(new AutoGenerateUidFilter(), AuthentificateFromUidFilter.class)
-        .anonymous().disable();
+        .addFilterBefore(new AutoGenerateUidFilter(), AuthenticateFromUidFilter.class)
+        .anonymous(anonymous -> anonymous.disable());
   }
 
   @Bean
   public SecurityFilterChain publicChain(HttpSecurity http) throws Exception {
     return http
-        .csrf().disable()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
-        .and()
+        .csrf(csrf -> csrf.disable())
+        .formLogin(form -> form.disable())
+        .logout(logout -> logout.disable())
+        .httpBasic(basic -> basic.disable())
+        .requestCache(cache -> cache.disable())
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.NEVER))
         .build();
-  }*/
+  }
 }

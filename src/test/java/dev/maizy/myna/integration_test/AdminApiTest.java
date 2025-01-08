@@ -71,7 +71,8 @@ class AdminApiTest {
     webClient
         .get().uri("/admin/api/v1/ruleset")
         .exchange()
-        .expectStatus().isForbidden();
+        .expectStatus().isForbidden()
+        .expectHeader().doesNotExist("Set-Cookie");
   }
 
   @Test
@@ -81,7 +82,8 @@ class AdminApiTest {
           .uri("/admin/api/v1/ruleset")
           .header("Authorization", "Bearer unknowntoken")
         .exchange()
-        .expectStatus().isForbidden();
+        .expectStatus().isForbidden()
+        .expectHeader().doesNotExist("Set-Cookie");
   }
 
   @Test
@@ -91,14 +93,16 @@ class AdminApiTest {
           .uri("/admin/api/v1/ruleset")
           .header("Authorization", "Bearer admintoken1")
         .exchange()
-        .expectStatus().isOk();
+        .expectStatus().isOk()
+        .expectHeader().doesNotExist("Set-Cookie");
 
     webClient
         .get()
           .uri("/admin/api/v1/ruleset")
           .header("Authorization", "Bearer admintoken2")
         .exchange()
-        .expectStatus().isOk();
+        .expectStatus().isOk()
+        .expectHeader().doesNotExist("Set-Cookie");
   }
 
   @Test
@@ -109,12 +113,13 @@ class AdminApiTest {
 
     webClient
         .get()
-          .uri("/admin/api/v1/ruleset/{id}", sampleRuleset.id())
-          .accept(MediaType.APPLICATION_JSON)
-          .header("Authorization", "Bearer admintoken1")
+        .uri("/admin/api/v1/ruleset/{id}", sampleRuleset.id())
+        .accept(MediaType.APPLICATION_JSON)
+        .header("Authorization", "Bearer admintoken1")
         .exchange()
         .expectStatus().isNotFound()
-            .expectBody().json("""
+        .expectHeader().doesNotExist("Set-Cookie")
+        .expectBody().json("""
               {"error": "not_found"}
             """);
 
@@ -126,6 +131,7 @@ class AdminApiTest {
           .bodyValue(rulesetJson)
         .exchange()
         .expectStatus().isOk()
+        .expectHeader().doesNotExist("Set-Cookie")
         .expectBody().jsonPath("$.id").isEqualTo(sampleRuleset.id());
 
     webClient
@@ -135,6 +141,7 @@ class AdminApiTest {
           .accept(MediaType.APPLICATION_JSON)
         .exchange()
         .expectStatus().isOk()
+        .expectHeader().doesNotExist("Set-Cookie")
         .expectBody().json(rulesetJson);
   }
 
@@ -148,6 +155,7 @@ class AdminApiTest {
           .header("Authorization", "Bearer admintoken1")
         .exchange()
         .expectStatus().isOk()
+        .expectHeader().doesNotExist("Set-Cookie")
         .expectBody()
           // predefined ruleset & one added above
           .jsonPath("$.total_elements").isEqualTo(2)
@@ -164,7 +172,8 @@ class AdminApiTest {
           .uri("/admin/api/v1/ruleset/{id}", sampleRuleset.id())
           .header("Authorization", "Bearer admintoken1")
         .exchange()
-        .expectStatus().isNoContent();
+        .expectStatus().isNoContent()
+        .expectHeader().doesNotExist("Set-Cookie");
 
     webClient
         .get()
@@ -172,7 +181,8 @@ class AdminApiTest {
           .header("Authorization", "Bearer admintoken1")
           .accept(MediaType.APPLICATION_JSON)
         .exchange()
-        .expectStatus().isNotFound();
+        .expectStatus().isNotFound()
+        .expectHeader().doesNotExist("Set-Cookie");
   }
 
   @Test
@@ -187,6 +197,7 @@ class AdminApiTest {
           .header("Authorization", "Bearer admintoken1")
         .exchange()
         .expectStatus().isForbidden()
+        .expectHeader().doesNotExist("Set-Cookie")
         .expectBody().jsonPath("error").isEqualTo("unable");
   }
 }

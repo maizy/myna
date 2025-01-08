@@ -7,11 +7,11 @@ package dev.maizy.myna.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
-public class PreconfiguratedTokensFilter extends AbstractPreAuthenticatedProcessingFilter {
+public class PreconfiguredTokensFilter extends AbstractPreAuthenticatedProcessingFilter {
 
   public static final String AUTHORIZATION_HEADER = "Authorization";
   public static final String BEARER_PREFIX = "Bearer ";
-  public static final Object NA = new Object();
+  public static final String NA = "NA";
 
   @Override
   protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {

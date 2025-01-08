@@ -16,6 +16,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     dev.maizy: TRACE
     web: DEBUG
+#    org.springframework.security: DEBUG
 server:
   address: localhost
 #  servlet:
