@@ -27,6 +27,7 @@ repositories {
 ext {
   set('testcontainersVersion', '1.19.4')
   set('immutablesVersion', '2.10.1')
+  set('dockerImageVersion', '0.0.1-preview3')
 }
 
 dependencies {
@@ -73,6 +74,19 @@ dependencyManagement {
 bootRun {
     systemProperty 'spring.config.additional-location', "$projectDir/dev/config/"
     systemProperty 'spring.profiles.active', 'default,dev'
+}
+
+tasks.named('bootBuildImage') {
+	imageName = "ghcr.io/maizy/${project.name}:$dockerImageVersion"
+  environment['BP_JVM_TYPE'] = 'JDK'
+  buildpacks = [
+      'gcr.io/paketo-buildpacks/ca-certificates:latest',
+      'gcr.io/paketo-buildpacks/amazon-corretto:latest',
+      'gcr.io/paketo-buildpacks/syft:latest',
+      'gcr.io/paketo-buildpacks/executable-jar:latest',
+      'gcr.io/paketo-buildpacks/dist-zip:latest',
+      'gcr.io/paketo-buildpacks/spring-boot:latest',
+  ]
 }
 
 tasks.named('test') {

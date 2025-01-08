@@ -58,11 +58,11 @@ spec:
                 secretKeyRef:
                   name: '{{ .Release.Name }}-postgresql'
                   key: password
-            - name: SPRING_REDIS_HOST
+            - name: SPRING_DATA_REDIS_HOST
               value: '{{ .Release.Name }}-redis-master'
-            - name: SPRING_REDIS_PORT
+            - name: SPRING_DATA_REDIS_PORT
               value: '6379'
-            - name: SPRING_REDIS_PASSWORD
+            - name: SPRING_DATA_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: '{{ .Release.Name }}-redis'

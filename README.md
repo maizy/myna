@@ -43,7 +43,7 @@ https://github.com/maizy/myna/assets/789623/97952daa-3406-48a6-af20-c89ebdedb17b
 * setup `deploy/helm/myna/values.yaml`
 * deploy
 
-```
+```shell
 cd deploy/helm
 helm dependency build myna
 helm install <NAME> myna
@@ -55,7 +55,7 @@ I made it because I needed to revise Spring ecosystem and do something useful at
 
 So, the key points of this project are
 
-* Based on Spring components: Spring Boot 2.x, Spring Web MVC, Spring Security, Spring Data
+* Based on Spring components: Spring Boot 3.x, Spring Web MVC, Spring Security, Spring Data
 * Service is stateless, it's ready to run in a distributed manner
 * All state stored in Redis and PostgresSQL
 * Redis pubsub is used for the internal message bus, and all messages pass through this bus
@@ -73,14 +73,24 @@ Requirements:
 
 Start DB:
 
-```
+```shell
 ./dev/start-db.sh
 ```
 
 Start project in dev mode:
 
-```
+```shell
 ./gradlew bootRun
 ```
 
 Or use run configurations for IntelliJ IDEA.
+
+## Build & publish
+
+```shell
+./gradlew bootBuildImage
+docker push ghcr.io/maizy/myna:x.y.z
+
+docker tag ghcr.io/maizy/myna:x.y.z ghcr.io/maizy/myna:latest
+docker push ghcr.io/maizy/myna:latest
+```
