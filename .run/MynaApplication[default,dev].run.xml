@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MynaApplication[default,dev]" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="dev.maizy.myna.MynaApplication" />
+    <module name="myna.main" />
+    <option name="VM_PARAMETERS" value="-Dspring.profiles.active=default,dev -Dspring.config.additional-location=dev/config/" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="dev.maizy.myna.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

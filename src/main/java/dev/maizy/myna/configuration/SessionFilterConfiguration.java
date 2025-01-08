@@ -5,10 +5,10 @@ package dev.maizy.myna.configuration;
  */
 
 import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,7 +21,7 @@ public class SessionFilterConfiguration extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
                                   FilterChain filterChain) throws ServletException, IOException {
     // disable session filter to prevent checking session in the storage when the session cookie is provided
-    // seems like it's only available workarond, see https://github.com/spring-projects/spring-session/issues/244
+    // seems like it's only available workaround, see https://github.com/spring-projects/spring-session/issues/244
     // there is no way to configure springSessionRepositoryFilter urls matcher
     if (!UrisWithSession.isUriWithSession(httpRequest.getRequestURI())) {
       httpRequest.setAttribute("org.springframework.session.web.http.SessionRepositoryFilter.FILTERED", Boolean.TRUE);

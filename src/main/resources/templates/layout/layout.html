@@ -6,6 +6,6 @@
 <head th:replace="~{layout/partial/head::head(title=${title}, links=${headLinks}, scripts=${headScripts})}"></head>
 <body class="d-flex flex-column h-100">
     <main class="container flex-shrink-0" th:insert="${content}"></main>
-    <footer th:replace="layout/partial/footer::footer()"></footer>
+    <footer th:replace="~{layout/partial/footer::footer()}"></footer>
 </body>
 </html>

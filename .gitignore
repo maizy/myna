@@ -19,6 +19,8 @@ Desktop.ini
 *.log
 
 build/
+out/
+generated/
 .gradle/
 
 dev/data/postgres/data

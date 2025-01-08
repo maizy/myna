@@ -20,9 +20,9 @@ public final class Redis {
   }
 
   public static void use(RedisContainer instance, DynamicPropertyRegistry registry) {
-    registry.add("spring.redis.host", instance::getHost);
-    registry.add("spring.redis.port", () -> instance.getMappedPort(6379).toString());
-    registry.add("spring.redis.password", () -> redisPass);
+    registry.add("spring.data.redis.host", instance::getHost);
+    registry.add("spring.data.redis.port", () -> instance.getMappedPort(6379).toString());
+    registry.add("spring.data.redis.password", () -> redisPass);
   }
 
   private Redis() {

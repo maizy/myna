@@ -1,7 +1,7 @@
 package dev.maizy.myna.configuration;
 
 /*
- * Copyright (c) Nikita Kovalev, maizy.dev, 2024
+ * Copyright (c) Nikita Kovalev, maizy.dev, 2024-2025
  * See LICENSE.txt for details.
  */
 
@@ -11,20 +11,28 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public final class UrisWithSession {
-  public static final String[] resourcesWithCsrfProtection = {"/whoami"};
-  private static final Set<String> resourcesSet = new HashSet<>(Arrays.asList(resourcesWithCsrfProtection));
-
+  public static final String[] resourcesWithCsrfProtection = {};
   public static final String[] resourcesPrefixesWithCsrfProtection = {"/game", "/games"};
+
+  public static final String[] resourcesWithoutCsrfProtection = {"/whoami"};
   public static final String[] resourcesPrefixesWithoutCsrfProtection = {"/ws"};
+
   public static final String[] mvcRulesWithCsrfProtection = Stream.concat(
       Arrays.stream(resourcesPrefixesWithCsrfProtection).map(p -> p + "/**"),
       Arrays.stream(resourcesWithCsrfProtection)
   ).toArray(String[]::new);
 
-  public static final String[] mvcRulesWithoutCsrfProtection =
-      Arrays.stream(resourcesPrefixesWithoutCsrfProtection)
-          .map(p -> p + "/**")
-          .toArray(String[]::new);
+  public static final String[] mvcRulesWithoutCsrfProtection = Stream.concat(
+      Arrays.stream(resourcesPrefixesWithoutCsrfProtection).map(p -> p + "/**"),
+      Arrays.stream(resourcesWithoutCsrfProtection)
+  ).toArray(String[]::new);
+
+  private static final Set<String> resourcesSet = new HashSet<>(
+      Stream.concat(
+          Arrays.stream(resourcesWithCsrfProtection),
+          Arrays.stream(resourcesWithoutCsrfProtection)
+      ).toList()
+  );
 
   /*
    * Primitive URI matcher

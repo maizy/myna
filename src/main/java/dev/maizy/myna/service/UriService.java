@@ -5,7 +5,7 @@ package dev.maizy.myna.service;
  */
 
 import dev.maizy.myna.configuration.MynaProperties;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
